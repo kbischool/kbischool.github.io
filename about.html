@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>About Us · KBI Schools</title>
 <meta name="description" content="Our history, values, board of directors, staff and prefect system.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23132038%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 fill=%22%23E3A430%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22>K</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%2315132B%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 fill=%22%23FFB400%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22>K</text></svg>">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+<div class="scroll-progress" id="scrollProgress"></div>
 <a class="skip-link" href="#main">Skip to content</a>
 
 <div class="topbar">
@@ -80,6 +81,7 @@
 <div class="hero page-hero">
 
     <div class="wrap">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span class="sep">/</span><span class="current">About</span></nav>
       <p class="path mono">kbi://about</p>
       <h1>About KBI Schools</h1>
       <p class="lede">Founded 2012 in Moniya, Ibadan — the people, values and history behind Knowledge Base International Schools.</p>
@@ -161,13 +163,13 @@
       <table class="tbl">
         <thead><tr><th>Role</th><th>Name on record</th><th>Section</th></tr></thead>
         <tbody>
-          <tr><td>School Administrator</td><td>Bukola Christiana Adebunmi</td><td>Whole school</td></tr>
-          <tr><td>Principal, KBI College</td><td>Pearce Folorunsho</td><td>Secondary (JSS–SSS)</td></tr>
-          <tr><td>Administration / Registrations</td><td>Dasola Margaret Awoyemi</td><td>Whole school</td></tr>
-          <tr><td>School Bursar</td><td>To be confirmed</td><td>Whole school</td></tr>
-          <tr><td>Head Teacher / Coordinator</td><td>To be confirmed</td><td>Primary</td></tr>
-          <tr><td>Head Teacher / Coordinator</td><td>To be confirmed</td><td>Nursery / Crèche</td></tr>
-          <tr><td>Security Officer</td><td>To be confirmed</td><td>Campus</td></tr>
+          <tr><td>School Administrator</td><td data-label="Name on record">Bukola Christiana Adebunmi</td><td data-label="Section">Whole school</td></tr>
+          <tr><td>Principal, KBI College</td><td data-label="Name on record">Pearce Folorunsho</td><td data-label="Section">Secondary (JSS–SSS)</td></tr>
+          <tr><td>Administration / Registrations</td><td data-label="Name on record">Dasola Margaret Awoyemi</td><td data-label="Section">Whole school</td></tr>
+          <tr><td>School Bursar</td><td data-label="Name on record">To be confirmed</td><td data-label="Section">Whole school</td></tr>
+          <tr><td>Head Teacher / Coordinator</td><td data-label="Name on record">To be confirmed</td><td data-label="Section">Primary</td></tr>
+          <tr><td>Head Teacher / Coordinator</td><td data-label="Name on record">To be confirmed</td><td data-label="Section">Nursery / Crèche</td></tr>
+          <tr><td>Security Officer</td><td data-label="Name on record">To be confirmed</td><td data-label="Section">Campus</td></tr>
         </tbody>
       </table>
     </div>
@@ -269,7 +271,8 @@
   </div>
 </footer>
 
-<script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+<button class="to-top" id="toTop" aria-label="Back to top">↑</button>
+
 <script src="assets/script.js"></script>
 </body>
 </html>

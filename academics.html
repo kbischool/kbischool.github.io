@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Academics · KBI Schools</title>
 <meta name="description" content="Curriculum, classes, subjects, practicals, calendar and external examinations at KBI Schools.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23132038%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 fill=%22%23E3A430%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22>K</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%2315132B%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 fill=%22%23FFB400%22 text-anchor=%22middle%22 font-family=%22Georgia,serif%22>K</text></svg>">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+<div class="scroll-progress" id="scrollProgress"></div>
 <a class="skip-link" href="#main">Skip to content</a>
 
 <div class="topbar">
@@ -80,6 +81,7 @@
 <div class="hero page-hero">
 
     <div class="wrap">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span class="sep">/</span><span class="current">Academics</span></nav>
       <p class="path mono">kbi://academics</p>
       <h1>Academics</h1>
       <p class="lede">Nigeria's national curriculum, enriched with STEM, Coding &amp; Robotics and Digital Technologies at every level.</p>
@@ -137,12 +139,12 @@
       <table class="tbl">
         <thead><tr><th>Level</th><th>Core subjects</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr><td>Primary</td><td>English, Mathematics, Intermediate Science, Social &amp; Citizenship Studies, Digital Technologies, French, Music, Creative &amp; Cultural Arts, CRS/IRS</td><td>Club periods (Music, French, STEM) built into the timetable</td></tr>
-          <tr><td>JSS 1–3</td><td>English, Mathematics, Intermediate Science, Social &amp; Citizenship Studies, Digital Technologies (compulsory), French, Business Studies, Creative Arts, PHE</td><td>STEM Coding &amp; Robotics club runs weekly</td></tr>
-          <tr><td>SSS — Science track</td><td>English, Mathematics, Physics, Chemistry, Biology, Further Mathematics, Citizenship &amp; Heritage Studies, Digital Technologies</td><td>WAEC / JAMB preparation</td></tr>
-          <tr><td>SSS — Commercial track</td><td>English, Mathematics, Economics, Financial Accounting, Marketing, Digital Technologies</td><td>Economics/Marketing limited to this track</td></tr>
-          <tr><td>SSS — Arts track</td><td>English, Mathematics, Literature-in-English, Government, CRS, Geography, Digital Technologies</td><td>WAEC-recommended texts followed each cycle</td></tr>
-          <tr><td>Trade subject</td><td>Animal Husbandry</td><td>Primary trade subject under the current curriculum</td></tr>
+          <tr><td>Primary</td><td data-label="Core subjects">English, Mathematics, Intermediate Science, Social &amp; Citizenship Studies, Digital Technologies, French, Music, Creative &amp; Cultural Arts, CRS/IRS</td><td data-label="Notes">Club periods (Music, French, STEM) built into the timetable</td></tr>
+          <tr><td>JSS 1–3</td><td data-label="Core subjects">English, Mathematics, Intermediate Science, Social &amp; Citizenship Studies, Digital Technologies (compulsory), French, Business Studies, Creative Arts, PHE</td><td data-label="Notes">STEM Coding &amp; Robotics club runs weekly</td></tr>
+          <tr><td>SSS — Science track</td><td data-label="Core subjects">English, Mathematics, Physics, Chemistry, Biology, Further Mathematics, Citizenship &amp; Heritage Studies, Digital Technologies</td><td data-label="Notes">WAEC / JAMB preparation</td></tr>
+          <tr><td>SSS — Commercial track</td><td data-label="Core subjects">English, Mathematics, Economics, Financial Accounting, Marketing, Digital Technologies</td><td data-label="Notes">Economics/Marketing limited to this track</td></tr>
+          <tr><td>SSS — Arts track</td><td data-label="Core subjects">English, Mathematics, Literature-in-English, Government, CRS, Geography, Digital Technologies</td><td data-label="Notes">WAEC-recommended texts followed each cycle</td></tr>
+          <tr><td>Trade subject</td><td data-label="Core subjects">Animal Husbandry</td><td data-label="Notes">Primary trade subject under the current curriculum</td></tr>
         </tbody>
       </table>
     </div>
@@ -180,9 +182,9 @@
       <p style="margin-top:12px;color:var(--muted)">KBI Schools follows a standard three-term academic year:</p>
       <table class="tbl" style="margin-top:14px">
         <tbody>
-          <tr><td>First Term</td><td class="mono" style="text-align:right">September – December</td></tr>
-          <tr><td>Second Term</td><td class="mono" style="text-align:right">January – April</td></tr>
-          <tr><td>Third Term</td><td class="mono" style="text-align:right">April – July</td></tr>
+          <tr><td>First Term</td><td class="mono" data-label="Dates" style="text-align:right">September – December</td></tr>
+          <tr><td>Second Term</td><td class="mono" data-label="Dates" style="text-align:right">January – April</td></tr>
+          <tr><td>Third Term</td><td class="mono" data-label="Dates" style="text-align:right">April – July</td></tr>
         </tbody>
       </table>
     </div>
@@ -284,7 +286,8 @@
   </div>
 </footer>
 
-<script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+<button class="to-top" id="toTop" aria-label="Back to top">↑</button>
+
 <script src="assets/script.js"></script>
 </body>
 </html>

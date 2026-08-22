@@ -19,14 +19,22 @@ Settings → Pages configuration needed.
 Plain static HTML/CSS/JavaScript — no framework, no build step, no
 dependencies beyond Google Fonts.
 
-- **Fonts:** Fraunces (headlines), Inter (body), IBM Plex Mono (nav
+- **Fonts:** Space Grotesk (headlines), Inter (body), JetBrains Mono (nav
   breadcrumbs like `kbi://about/values`, tags, labels — the site's
   recurring "coding identity" motif)
-- **Palette:** deep navy `#132038`, warm gold `#E3A430`, forest green
-  `#2B6E4E`, warm paper `#F7F8F3`
+- **Palette:** re-themed onto the "AI Career Engine" design system — deep
+  ink `#15132B` / soft off-white `#F5F6FC`, with five accent colours in
+  rotation: coral `#FF4759`, indigo `#4F5BFF`, amber `#FFB400`,
+  teal `#00C2A8`, violet `#7C5CFC`
+- **Layout:** sticky blurred header with pill nav + dropdown panels,
+  off-canvas mobile drawer, soft rounded cards with an accent top-bar
+  that auto-cycles per grid, responsive tables that collapse into
+  labelled cards on mobile, a scroll-progress bar and a back-to-top
+  button
 - `assets/style.css` — the full design system, shared across every page
 - `assets/script.js` — mobile nav (hamburger toggle, tap-to-expand
-  dropdowns on screens ≤960px)
+  dropdowns on screens ≤960px), scroll-progress bar, back-to-top button,
+  footer year
 
 ## Site structure
 
