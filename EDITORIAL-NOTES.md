@@ -41,6 +41,40 @@ debate results are in fact real, let me know and I'll add them back with a sourc
   microsite, not the current live site)
 - Consent from any named staff/students before publishing their name or photo
 
+## Content deep-dive vs. the live site (this revision)
+I re-fetched kbischools.com.ng page-by-page and corrected several things that were
+factually wrong or outdated in the previous build:
+- **Fixed a real misattribution**: the "classrooms are where character is built..."
+  quote is from **Mrs Bukola Adebunmi (Administrator)**, not Pearce Folorunsho — it had
+  the wrong name and title attached.
+- **Fixed the staff table**: Pearce Folorunsho is the **School Consultant**, not the
+  Principal. The real Principal, KBI College is **Ganiyat Okunloye Jamiu** (missing
+  before). Removed two fabricated rows ("School Bursar", "Security Officer") that
+  don't appear on the real site, and added the real Assistant School Administrator,
+  Matron and PTA Chairman rows.
+- **Facebook URL and social icons updated** to match the live site exactly
+  (facebook.com/kbischoolsibadan; swapped the non-existent "Threads" link for WhatsApp,
+  which is what the school actually links).
+- **"Primary 1–5/6" corrected to "Primary 1–5"** — the real class list stops at 5.
+- **Expanded Our Values, Prefects, and Management** with the real, detailed content
+  from the live site (all 6 values with full descriptions; all 12 real prefect roles
+  plus Head Boy/Head Girl; Board of Directors bios).
+- **News & Events restructured**: the real site currently shows exactly two live posts
+  ("Admission Open for 2026-2027 Academic Session", "School Resumption" — 14 Sept 2026).
+  Added those with their real text, and clearly relabelled the other event-type items as
+  "typical events throughout our year" rather than implying they're dated posts.
+- Added the missing **CBT** quick link (the real homepage has 5 quick links, we had 4).
+- Added a **Python** entry to the ICT tools list, and the real "Learning Beyond the
+  Classroom" / "Environment Designed for Growth" sections to Facilities.
+- Fixed a CSS bug this pass introduced: a generic `.icon` utility class (added for SVG
+  icons) was colliding with the pre-existing `.icon` text-label class used inside
+  `.callout` boxes, squashing labels like "TO CONFIRM" into a 1em box and causing text
+  to overlap. Scoped `.callout .icon` to override width/height so both coexist safely.
+
+Pages that were still Lorem Ipsum or empty on the live site (History, Prospectus,
+Curriculum) were left as our own placeholder content, clearly flagged with "to confirm"
+callouts rather than presented as verified fact.
+
 ## 🖼️ Template images — swap these for real photos
 I couldn't pull real campus photography into this build (no live network access in my
 working environment), so every photo slot on the site is a labelled placeholder frame:
