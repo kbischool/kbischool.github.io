@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var dropdown = li.querySelector('.dropdown');
     if (!dropdown || !trigger) return;
     trigger.addEventListener('click', function (e) {
-      if (window.innerWidth <= 960) {
+      if (window.innerWidth <= 1220) {
         e.preventDefault();
         var isOpen = li.classList.toggle('open');
         trigger.setAttribute('aria-expanded', isOpen);
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   window.addEventListener('resize', function () {
-    if (window.innerWidth > 960 && nav) {
+    if (window.innerWidth > 1220 && nav) {
       closeDrawer();
     }
   });
