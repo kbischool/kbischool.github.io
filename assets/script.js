@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var dropdown = li.querySelector('.dropdown');
     if (!dropdown || !trigger) return;
     trigger.addEventListener('click', function (e) {
-      if (window.innerWidth <= 1220) {
+      if (window.innerWidth <= 1300) {
         e.preventDefault();
         var isOpen = li.classList.toggle('open');
         trigger.setAttribute('aria-expanded', isOpen);
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   window.addEventListener('resize', function () {
-    if (window.innerWidth > 1220 && nav) {
+    if (window.innerWidth > 1300 && nav) {
       closeDrawer();
     }
   });
@@ -75,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (y) y.textContent = new Date().getFullYear();
 
   /* ---------- REVEAL ON SCROLL (progressive enhancement) ---------- */
-  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!reduceMotion && 'IntersectionObserver' in window) {
     var revealTargets = document.querySelectorAll('.card, .stat, .news-card, .faq-item, .section-head, .photo-frame');
     var io = new IntersectionObserver(function (entries) {
@@ -90,6 +89,12 @@ document.addEventListener('DOMContentLoaded', function () {
       el.classList.add('reveal-ready');
       el.style.transitionDelay = Math.min(i % 4, 3) * 60 + 'ms';
       io.observe(el);
+    });
+  } else {
+    // No IntersectionObserver support (or reduced motion): show content immediately,
+    // never add the opacity:0 starting state in the first place.
+    document.querySelectorAll('.card, .stat, .news-card, .faq-item, .section-head, .photo-frame').forEach(function (el) {
+      el.classList.add('in-view');
     });
   }
 
