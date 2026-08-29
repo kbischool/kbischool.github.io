@@ -33,6 +33,7 @@
 <symbol id="i-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
 <symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
 <symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+<symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.75"/><path d="m4 17 5-5 3.5 3.5L17 11l3.5 3.5"/></symbol>
 </svg>
 <div class="scroll-progress" id="scrollProgress"></div>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -104,9 +105,9 @@
 
 <main id="main">
 <div class="hero">
+  <div class="hero-shapes" aria-hidden="true"><span class="shape s1"></span><span class="shape s2"></span><span class="shape s3"></span></div>
 
     <div class="wrap">
-      <p class="path mono">kbi://home</p>
       <h1>Knowledge in Humility.</h1>
       <p class="lede">A private Crèche-to-Senior-Secondary school in Moniya, Ibadan, since 2012 — pairing academic discipline with real STEM, Coding &amp; Robotics education.</p>
       
@@ -121,12 +122,11 @@
       </div>
     </div>
 </div>
-<div class="circuit dark"><span class="ln"></span><span class="node"></span><span class="ln"></span></div>
+<div class="circuit"><span class="ln"></span><span class="node"></span><span class="ln"></span></div>
 
 <section class="tight">
   <div class="wrap">
     <div class="section-head" style="margin-bottom:18px">
-      <p class="path">kbi://quick-links</p>
       <h2 style="font-size:clamp(20px,3.6vw,26px)">Quick links</h2>
       <p class="lede">Straight through to the school's live student &amp; parent systems.</p>
     </div>
@@ -155,11 +155,27 @@
   </div>
 </section>
 
+<div class="circuit"><span class="ln"></span><span class="node"></span><span class="ln"></span></div>
+
+<section class="tight alt">
+  <div class="wrap">
+    <div class="section-head" style="margin-bottom:18px">
+      <h2 style="font-size:clamp(20px,3.6vw,26px)">A peek at our campus</h2>
+      <p class="lede">Template frames standing in for real campus photography — swap each one for a photo whenever it's ready (see EDITORIAL-NOTES.md).</p>
+    </div>
+    <div class="grid grid-4">
+      <div class="photo-frame"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span>School Main Block</span></div>
+      <div class="photo-frame"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span>Graduation Day</span></div>
+      <div class="photo-frame"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span>School Auditorium</span></div>
+      <div class="photo-frame"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span>Main Library</span></div>
+    </div>
+  </div>
+</section>
+
 
 <section>
   <div class="wrap two-col">
     <div>
-      <p class="path">kbi://about/welcome</p>
       <h2>Welcome to KBI Schools</h2>
       <p style="margin-top:16px;font-size:16.5px;color:var(--muted)">Knowledge Base International Schools (KBI Schools) is a private institution in Moniya, Ibadan, providing quality education from Crèche through Senior Secondary School (KBI College) since 2012. We pair a solid academic foundation with discipline, character formation, and hands‑on exposure to technology — preparing every child not just to pass an exam, but to think, create, and lead.</p>
       <p style="margin-top:14px;font-size:16.5px;color:var(--muted)">At KBI Schools, we believe true education goes beyond the classroom. We are committed to a safe, supportive and stimulating environment where every child discovers their potential, builds confidence, thinks critically, and prepares for a successful future — guided by our motto, <em>Knowledge in Humility</em>.</p>
@@ -168,7 +184,7 @@
       </div>
     </div>
     <div class="grid" style="gap:16px">
-      <div class="stat"><span class="num">2012</span><span class="label">founded in moniya, ibadan</span></div>
+      <div class="stat"><span class="num" data-counter="2012">0</span><span class="label">founded in moniya, ibadan</span></div>
       <div class="stat"><span class="num">crèche–sss3</span><span class="label">one continuous pipeline</span></div>
       <div class="stat"><span class="num">NAPPS</span><span class="label">affiliated · akinyele lga</span></div>
     </div>
@@ -178,7 +194,6 @@
 <section class="alt">
   <div class="wrap">
     <div class="section-head">
-      <p class="path">kbi://about/leadership</p>
       <h2>A message from our leadership</h2>
       <p class="lede">Notes from the people who run KBI Schools day to day — on what we're building, and why.</p>
     </div>
@@ -226,16 +241,15 @@
 <section class="alt">
   <div class="wrap">
     <div class="section-head">
-      <p class="path">kbi://why-us</p>
       <h2>Why families choose KBI Schools</h2>
     </div>
     <div class="grid grid-3">
-      <div class="card"><svg class="icon icon-lg" style="color:var(--card-accent)" aria-hidden="true"><use href="#i-cap"></use></svg><span class="code mono">01 · academics</span><h3>Academic excellence</h3><p>A structured curriculum from Crèche to SSS3 built around Common Entrance, BECE, WAEC/NECO and JAMB success, supported by scheme-of-work-driven teaching and regular mock examinations.</p></div>
-      <div class="card"><svg class="icon icon-lg" style="color:var(--card-accent)" aria-hidden="true"><use href="#i-shield"></use></svg><span class="code mono">02 · character</span><h3>Moral &amp; discipline</h3><p>Character formation is treated as seriously as academics — honesty, respect and personal responsibility, with clear, firm but fair standards across every section.</p></div>
-      <div class="card"><svg class="icon icon-lg" style="color:var(--card-accent)" aria-hidden="true"><use href="#i-award"></use></svg><span class="code mono">03 · history</span><h3>Proven track record</h3><p>Since 2012, KBI Schools has grown from a small nursery/primary outfit into a full Crèche-to-SSS3 institution, guiding students through Common Entrance, BECE and WAEC/NECO with transparent fee communication.</p></div>
-      <div class="card"><svg class="icon icon-lg" style="color:var(--card-accent)" aria-hidden="true"><use href="#i-building"></use></svg><span class="code mono">04 · campus</span><h3>Facilities</h3><p>Purpose-built classrooms, an ICT/Digital Technologies lab, a library, a science laboratory, an outdoor sports field and a multipurpose hall for assemblies and ceremonies.</p></div>
-      <div class="card"><svg class="icon icon-lg" style="color:var(--card-accent)" aria-hidden="true"><use href="#i-users"></use></svg><span class="code mono">05 · staffing</span><h3>Qualified staffing</h3><p>A blended team of experienced permanent teachers and NYSC corps members — many of whom stay connected to the school long after service through our Ex‑Corpers network.</p></div>
-      <div class="card"><svg class="icon icon-lg" style="color:var(--card-accent)" aria-hidden="true"><use href="#i-cpu"></use></svg><span class="code mono">06 · practicals</span><h3>Hands-on practicals</h3><p>STEM, Coding &amp; Robotics education plus a Prevocational Skills programme covering arts &amp; crafts, household products and pastry-making — real exposure to the tools of a changing world.</p></div>
+      <div class="card"><svg class="icon icon-lg" style="color:var(--sky-text)" aria-hidden="true"><use href="#i-cap"></use></svg><span class="code mono">01 · academics</span><h3>Academic excellence</h3><p>A structured curriculum from Crèche to SSS3 built around Common Entrance, BECE, WAEC/NECO and JAMB success, supported by scheme-of-work-driven teaching and regular mock examinations.</p></div>
+      <div class="card"><svg class="icon icon-lg" style="color:var(--sky-text)" aria-hidden="true"><use href="#i-shield"></use></svg><span class="code mono">02 · character</span><h3>Moral &amp; discipline</h3><p>Character formation is treated as seriously as academics — honesty, respect and personal responsibility, with clear, firm but fair standards across every section.</p></div>
+      <div class="card"><svg class="icon icon-lg" style="color:var(--sky-text)" aria-hidden="true"><use href="#i-award"></use></svg><span class="code mono">03 · history</span><h3>Proven track record</h3><p>Since 2012, KBI Schools has grown from a small nursery/primary outfit into a full Crèche-to-SSS3 institution, guiding students through Common Entrance, BECE and WAEC/NECO with transparent fee communication.</p></div>
+      <div class="card"><svg class="icon icon-lg" style="color:var(--sky-text)" aria-hidden="true"><use href="#i-building"></use></svg><span class="code mono">04 · campus</span><h3>Facilities</h3><p>Purpose-built classrooms, an ICT/Digital Technologies lab, a library, a science laboratory, an outdoor sports field and a multipurpose hall for assemblies and ceremonies.</p></div>
+      <div class="card"><svg class="icon icon-lg" style="color:var(--sky-text)" aria-hidden="true"><use href="#i-users"></use></svg><span class="code mono">05 · staffing</span><h3>Qualified staffing</h3><p>A blended team of experienced permanent teachers and NYSC corps members — many of whom stay connected to the school long after service through our Ex‑Corpers network.</p></div>
+      <div class="card"><svg class="icon icon-lg" style="color:var(--sky-text)" aria-hidden="true"><use href="#i-cpu"></use></svg><span class="code mono">06 · practicals</span><h3>Hands-on practicals</h3><p>STEM, Coding &amp; Robotics education plus a Prevocational Skills programme covering arts &amp; crafts, household products and pastry-making — real exposure to the tools of a changing world.</p></div>
     </div>
   </div>
 </section>
@@ -243,7 +257,6 @@
 <section>
   <div class="wrap two-col">
     <div>
-      <p class="path">kbi://learning-benefits</p>
       <h2>What learning looks like here</h2>
       <ul class="checklist" style="margin-top:20px">
         <li>Small class sizes</li>
@@ -267,7 +280,6 @@
   <div class="wrap">
     <div class="section-head" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;max-width:none">
       <div>
-        <p class="path">kbi://news</p>
         <h2 class="mt-0">News &amp; events</h2>
       </div>
       <a class="btn btn-line" href="news.html">All news →</a>
@@ -282,7 +294,7 @@
 
 <section>
   <div class="wrap">
-    <div class="section-head"><p class="path">kbi://quick-links</p><h2>Quick links</h2></div>
+    <div class="section-head"><h2>Quick links</h2></div>
     <div class="grid grid-4">
       <a class="card" href="https://kbischools.com.ng/signin" target="_blank" rel="noopener"><span class="code mono">portal</span><h3 style="font-size:16px">Portal login</h3><p>Students, parents &amp; staff</p></a>
       <a class="card" href="https://kbischools.com.ng/result_checker/get_student_result" target="_blank" rel="noopener"><span class="code mono">results</span><h3 style="font-size:16px">Check result</h3><p>Term result checker</p></a>
@@ -297,7 +309,6 @@
 
 <div class="cta-band">
   <div class="wrap">
-    <p class="path mono center" style="justify-content:center">kbi://admission</p>
     <h2>Ready to register your child?</h2>
     <p class="lede">Admission is open across Crèche, Nursery, Primary and Secondary (KBI College). Our team will walk you through the entrance assessment and placement process.</p>
     <div class="hero-cta">

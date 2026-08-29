@@ -41,10 +41,23 @@ debate results are in fact real, let me know and I'll add them back with a sourc
   microsite, not the current live site)
 - Consent from any named staff/students before publishing their name or photo
 
+## 🖼️ Template images — swap these for real photos
+I couldn't pull real campus photography into this build (no live network access in my
+working environment), so every photo slot on the site is a labelled placeholder frame:
+a light sky-blue box with an image icon and a caption naming what should go there
+(e.g. "School Main Block", "Graduation Day"). They're on the homepage ("A peek at our
+campus") and every Facilities card. To swap one in, replace the whole
+`<div class="photo-frame">...</div>` with a normal `<img src="assets/img/your-photo.jpg"
+alt="...">` — the surrounding card/grid CSS doesn't need to change.
+The live site (kbischools.com.ng) already has real photos in its homepage slider —
+School Main Block, Graduation Day, the Auditorium, the Library, and a standard
+classroom — matching the captions I used, so those are the natural first ones to add.
+
 ## What's in this delivery
 - `index.html`, `about.html`, `admission.html`, `academics.html`, `facilities.html`,
   `ict.html`, `alumni.html`, `news.html`, `contact.html` — the full site, styled and linked
 - `assets/style.css`, `assets/script.js` — shared design system + mobile nav
+- `assets/img/logo.png` + generated favicons — the real school crest
 - Contact form and admission form are front-end only (no backend) — wire them to
   kbischools.com.ng's existing SchoolsFocus portal, or a form service, before publishing
 - Portal login / result checker / apply links point straight at the current live
@@ -52,7 +65,13 @@ debate results are in fact real, let me know and I'll add them back with a sourc
   payments) isn't something a static rebuild can replace
 
 ## Design notes
-Palette: deep navy `#132038`, warm gold `#E3A430`, forest green `#2B6E4E`, warm paper
-`#F7F8F3`. Type: Fraunces (headlines), Inter (body), IBM Plex Mono (nav paths, tags, labels)
-— the monospace "kbi://about/values" breadcrumb and the small circuit-line dividers are the
-site's signature motif, tying the visual language back to the school's own coding identity.
+Palette is now anchored on the school's own crest: light sky blue `#00CCFF` (text-safe
+variant `#00748F`) plus white carry the page — hero, cards, tags, dividers, icons,
+wayfinding. Amber `#FFB400` is reserved for action buttons (Apply Now, form submits);
+a few other accents (coral/indigo/teal/violet) appear only on the four external "system"
+cards (Portal Login, Check Result, etc.), which function as buttons rather than content.
+Type: Sora (headlines), Inter (body), JetBrains Mono (tags, labels) — the small circuit-line
+dividers are the site's signature motif, tying the visual language back to the school's own
+coding identity. The old `kbi://about/values`-style monospace path labels have been removed
+sitewide per feedback; the breadcrumb nav under each page's title is the only wayfinding text
+that remains.

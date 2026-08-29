@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ---------- REVEAL ON SCROLL (progressive enhancement) ---------- */
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!reduceMotion && 'IntersectionObserver' in window) {
-    var revealTargets = document.querySelectorAll('.card, .stat, .news-card, .faq-item, .section-head');
+    var revealTargets = document.querySelectorAll('.card, .stat, .news-card, .faq-item, .section-head, .photo-frame');
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
@@ -92,6 +92,74 @@ document.addEventListener('DOMContentLoaded', function () {
       io.observe(el);
     });
   }
+
+  /* ---------- ANIMATED STAT COUNTERS ---------- */
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    var counters = document.querySelectorAll('[data-counter]');
+    var countIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var el = entry.target;
+        var target = parseInt(el.getAttribute('data-counter'), 10);
+        var start = null;
+        var duration = 1100;
+        function step(ts) {
+          if (start === null) start = ts;
+          var progress = Math.min((ts - start) / duration, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = Math.round(eased * target);
+          if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+        countIO.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+    counters.forEach(function (el) { countIO.observe(el); });
+  } else {
+    document.querySelectorAll('[data-counter]').forEach(function (el) {
+      el.textContent = el.getAttribute('data-counter');
+    });
+  }
+
+  /* ---------- SMOOTH FAQ ACCORDION (progressive enhancement over native <details>) ---------- */
+  document.querySelectorAll('.faq-item').forEach(function (item) {
+    var body = item.querySelector('.faq-body');
+    if (!body || reduceMotion) return; // native <details> behaviour is already fully accessible
+    var summary = item.querySelector('summary');
+    item.style.overflow = 'hidden';
+    summary.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (item.hasAttribute('open')) {
+        var h = body.offsetHeight;
+        body.style.height = h + 'px';
+        requestAnimationFrame(function () {
+          body.style.transition = 'height .25s ease, opacity .25s ease';
+          body.style.height = '0px';
+          body.style.opacity = '0';
+        });
+        body.addEventListener('transitionend', function te() {
+          item.removeAttribute('open');
+          body.style.transition = '';
+          body.removeEventListener('transitionend', te);
+        });
+      } else {
+        item.setAttribute('open', '');
+        var full = body.scrollHeight;
+        body.style.height = '0px';
+        body.style.opacity = '0';
+        requestAnimationFrame(function () {
+          body.style.transition = 'height .3s ease, opacity .3s ease';
+          body.style.height = full + 'px';
+          body.style.opacity = '1';
+        });
+        body.addEventListener('transitionend', function te2() {
+          body.style.height = 'auto';
+          body.style.transition = '';
+          body.removeEventListener('transitionend', te2);
+        });
+      }
+    });
+  });
 
   /* ---------- LOCAL FORMS: accessible confirmation instead of alert() ---------- */
   document.querySelectorAll('form[data-local-form]').forEach(function (form) {
