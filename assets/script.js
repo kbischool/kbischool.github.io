@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (y) y.textContent = new Date().getFullYear();
 
   /* ---------- REVEAL ON SCROLL (progressive enhancement) ---------- */
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!reduceMotion && 'IntersectionObserver' in window) {
     var revealTargets = document.querySelectorAll('.card, .stat, .news-card, .faq-item, .section-head, .photo-frame');
     var io = new IntersectionObserver(function (entries) {
@@ -166,19 +167,68 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  /* ---------- LOCAL FORMS: accessible confirmation instead of alert() ---------- */
+  /* ---------- FORMS: real submission via FormSubmit, with graceful fallbacks ----------
+     Primary path: the <form> has a real action="https://formsubmit.co/..." and method="POST",
+     so it genuinely sends email even if JavaScript never runs. When JS *is* available, we
+     intercept submit and send the same data via fetch() to FormSubmit's AJAX endpoint instead,
+     so the person sees an inline confirmation without leaving the page. If that fetch fails
+     for any reason (offline, FormSubmit down, CORS blocked by a restrictive network), we fall
+     back to letting the browser submit the form normally rather than silently losing the
+     message. */
   document.querySelectorAll('form[data-local-form]').forEach(function (form) {
+    var successEl = form.querySelector('.form-status:not(.form-status-error)');
+    var errorEl = form.querySelector('.form-status-error');
+    var submitBtn = form.querySelector('button[type="submit"]');
+    var submitLabel = submitBtn ? submitBtn.textContent : '';
+
+    function showStatus(el) {
+      [successEl, errorEl].forEach(function (s) { if (s) s.hidden = true; });
+      if (el) { el.hidden = false; el.focus(); }
+    }
+
     form.addEventListener('submit', function (e) {
-      e.preventDefault();
       if (typeof form.reportValidity === 'function' && !form.reportValidity()) {
-        return; // native, accessible validation messages handle the invalid case
+        e.preventDefault(); // native, accessible validation messages handle the invalid case
+        return;
       }
-      var status = form.querySelector('.form-status');
-      form.reset();
-      if (status) {
-        status.hidden = false;
-        status.focus();
-      }
+      var action = form.getAttribute('action');
+      if (!action || !window.fetch) return; // no JS-enhanced path available: let the real POST happen
+
+      e.preventDefault();
+      var ajaxAction = action.replace('formsubmit.co/', 'formsubmit.co/ajax/');
+      var data = new FormData(form);
+
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
+
+      fetch(ajaxAction, {
+        method: 'POST',
+        body: data,
+        headers: { Accept: 'application/json' }
+      })
+        .then(function (res) { if (!res.ok) throw new Error('Request failed'); return res.json(); })
+        .then(function () {
+          form.reset();
+          showStatus(successEl);
+        })
+        .catch(function () {
+          // Fetch failed — fall back to a real, full-page form submission so the
+          // message still has a chance to send rather than just disappearing.
+          // (HTMLFormElement.submit() does not re-fire the 'submit' event, so this
+          // is safe and won't loop back into this same handler.)
+          form.submit();
+        })
+        .finally(function () {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitLabel; }
+        });
     });
   });
+
+  /* If we've just come back from a real (non-JS) FormSubmit redirect, show the confirmation */
+  if (/[?&]sent=true/.test(window.location.search)) {
+    var justSubmittedForm = document.querySelector('form[data-local-form]');
+    if (justSubmittedForm) {
+      var ok = justSubmittedForm.querySelector('.form-status:not(.form-status-error)');
+      if (ok) { ok.hidden = false; ok.focus(); }
+    }
+  }
 });

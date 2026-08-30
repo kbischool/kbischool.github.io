@@ -42,7 +42,6 @@
   <div class="wrap">
     <div class="topbar-contacts">
       <a href="tel:+2348126909498"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>+234 812 690 9498</a>
-      <a href="tel:+2348163086631"><svg class="icon" aria-hidden="true"><use href="#i-phone"></use></svg>+234 816 308 6631</a>
       <a href="mailto:knowledgebaseschools@gmail.com"><svg class="icon" aria-hidden="true"><use href="#i-mail"></use></svg>knowledgebaseschools@gmail.com</a>
       <span class="seg-muted"><svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>Moniya, Ibadan, Oyo State</span>
     </div>
@@ -67,38 +66,38 @@
     </a>
     <nav class="primary" aria-label="Primary">
       <ul>
-        <li class=""><a href="index.html">home</a></li>
+        <li class=""><a href="index.html">Home</a></li>
 <li class="">
-              <button aria-haspopup="true" aria-expanded="false">about <span class="caret">▾</span></button>
+              <button aria-haspopup="true" aria-expanded="false">About <span class="caret">▾</span></button>
               <div class="dropdown">
                 <a href="about.html#about-us">About Us</a><a href="about.html#history">Our History</a><a href="about.html#values">Our Values</a><a href="about.html#management">Management and Staff</a><a href="about.html#management-history">Management History</a><a href="about.html#prefects">Prefects</a>
               </div>
             </li>
 <li class="active">
-              <button aria-haspopup="true" aria-expanded="false" aria-current="page">admission <span class="caret">▾</span></button>
+              <button aria-haspopup="true" aria-expanded="false" aria-current="page">Admission <span class="caret">▾</span></button>
               <div class="dropdown">
                 <a href="admission.html#prospectus">Prospectus</a><a href="admission.html#procedure">Application Procedure</a><a href="admission.html#apply">Apply Here</a>
               </div>
             </li>
 <li class="">
-              <button aria-haspopup="true" aria-expanded="false">academics <span class="caret">▾</span></button>
+              <button aria-haspopup="true" aria-expanded="false">Academics <span class="caret">▾</span></button>
               <div class="dropdown">
                 <a href="academics.html#curriculum">Curriculum</a><a href="academics.html#classes">Classes</a><a href="academics.html#subjects">Subjects</a><a href="academics.html#practicals">Practicals</a><a href="academics.html#timetables">Timetables</a><a href="academics.html#calendar">School Calendar</a><a href="academics.html#exams">External Examinations</a>
               </div>
             </li>
-<li class=""><a href="facilities.html">facilities</a></li>
+<li class=""><a href="facilities.html">Facilities</a></li>
 <li class="">
-              <button aria-haspopup="true" aria-expanded="false">ict <span class="caret">▾</span></button>
+              <button aria-haspopup="true" aria-expanded="false">ICT <span class="caret">▾</span></button>
               <div class="dropdown">
                 <a href="ict.html#education">ICT Education / Empowerment</a><a href="ict.html#portals">E Portals</a><a href="ict.html#payments">E Payments</a><a href="ict.html#cbt">Computer Based Testing</a><a href="ict.html#results">E Results</a>
               </div>
             </li>
-<li class=""><a href="alumni.html">alumni</a></li>
-<li class=""><a href="news.html">news &amp; events</a></li>
-<li class=""><a href="contact.html">contact us</a></li>
+<li class=""><a href="alumni.html">Alumni</a></li>
+<li class=""><a href="news.html">News &amp; Events</a></li>
+<li class=""><a href="contact.html">Contact Us</a></li>
       </ul>
     </nav>
-    <a class="nav-cta mono" href="admission.html#apply">apply now →</a>
+    <a class="nav-cta mono" href="admission.html#apply">Apply Now →</a>
     <button class="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
   </div>
 </header>
@@ -191,20 +190,32 @@
 
     <div class="card" style="max-width:640px">
       <span class="code mono">or send a quick enquiry</span>
-      <form id="admissionForm" data-local-form style="margin-top:12px">
+      <form id="admissionForm" data-local-form
+            action="https://formsubmit.co/knowledgebaseschools@gmail.com"
+            method="POST" style="margin-top:12px">
+        <input type="hidden" name="_cc" value="techbasengr@gmail.com">
+        <input type="hidden" name="_subject" value="New admission enquiry — KBI Schools website">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="https://kbischools.com.ng/admission.html?sent=true">
         <div class="grid grid-2" style="gap:16px">
-          <div class="form-field"><label for="pname">Child's full name</label><input id="pname" name="child_name" autocomplete="name" required></div>
-          <div class="form-field"><label for="pclass">Class applying for</label><select id="pclass" name="class"><option>Crèche</option><option>Playgroup</option><option>Nursery</option><option>Primary</option><option>JSS</option><option>SSS</option></select></div>
+          <div class="form-field"><label for="pname">Child's full name</label><input id="pname" name="Child's full name" autocomplete="name" required></div>
+          <div class="form-field"><label for="pclass">Class applying for</label><select id="pclass" name="Class applying for"><option>Crèche</option><option>Playgroup</option><option>Nursery</option><option>Primary</option><option>JSS</option><option>SSS</option></select></div>
         </div>
         <div class="grid grid-2" style="gap:16px">
-          <div class="form-field"><label for="gname">Parent / guardian name</label><input id="gname" name="guardian_name" autocomplete="name" required></div>
-          <div class="form-field"><label for="gphone">Phone number</label><input id="gphone" name="phone" type="tel" autocomplete="tel" required></div>
+          <div class="form-field"><label for="gname">Parent / guardian name</label><input id="gname" name="Parent/guardian name" autocomplete="name" required></div>
+          <div class="form-field"><label for="gphone">Phone number</label><input id="gphone" name="Phone number" type="tel" autocomplete="tel" required></div>
         </div>
-        <div class="form-field"><label for="gmsg">Message (optional)</label><textarea id="gmsg" name="message" rows="3"></textarea></div>
+        <div class="form-field"><label for="gmsg">Message (optional)</label><textarea id="gmsg" name="Message" rows="3"></textarea></div>
         <button class="btn btn-gold" type="submit">Submit enquiry</button>
         <p class="form-status" role="status" aria-live="polite" tabindex="-1" hidden>
           <svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>
-          Thank you — your enquiry has been noted. Our admissions team will contact you shortly.
+          Thank you — your enquiry has been sent. Our admissions team will contact you shortly.
+        </p>
+        <p class="form-status form-status-error" role="alert" aria-live="assertive" tabindex="-1" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-external"></use></svg>
+          Something went wrong sending this automatically. Please email us directly at
+          <a href="mailto:knowledgebaseschools@gmail.com">knowledgebaseschools@gmail.com</a>.
         </p>
       </form>
     </div>
@@ -293,7 +304,6 @@
         <h5>Contact</h5>
         <ul>
           <li><a href="tel:+2348126909498">+234 812 690 9498</a></li>
-          <li><a href="tel:+2348163086631">+234 816 308 6631</a></li>
           <li><a href="mailto:knowledgebaseschools@gmail.com">knowledgebaseschools@gmail.com</a></li>
           <li>15, Okikiolu Haven, Opp. IDC Primary School, Apapa Area, Moniya, Ibadan</li>
         </ul>

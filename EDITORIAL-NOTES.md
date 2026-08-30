@@ -75,6 +75,50 @@ Pages that were still Lorem Ipsum or empty on the live site (History, Prospectus
 Curriculum) were left as our own placeholder content, clearly flagged with "to confirm"
 callouts rather than presented as verified fact.
 
+## Contact & admission forms now send real email
+Both forms POST to FormSubmit (formsubmit.co) — no backend server needed — to
+**knowledgebaseschools@gmail.com**, CC'd to **techbasengr@gmail.com**.
+**One-time setup required before these go live:** the first time each form is
+submitted, FormSubmit sends a confirmation email to knowledgebaseschools@gmail.com
+that must be opened and confirmed — this is FormSubmit's anti-spam activation step,
+not something I can complete on your behalf. After that one click, all future
+submissions deliver automatically.
+Also update the `_next` hidden field in both forms (currently pointing at
+`kbischools.com.ng/...`) if this site is deployed somewhere else, so people are
+redirected back to the right domain after a non-JavaScript form submission.
+Each form works two ways: with JavaScript, it submits invisibly and shows an inline
+"message sent" confirmation without leaving the page; without JavaScript (or if the
+request fails), it still submits for real via a normal page redirect. Either way the
+email actually sends.
+
+## Bugs found and fixed this round
+- The "Message sent" confirmation was showing on page load, before anyone filled
+  anything in. Cause: the stylesheet set `.form-status{display:flex}` unconditionally,
+  which silently overrode the browser's own handling of the `hidden` attribute. Fixed
+  by adding an explicit `.form-status[hidden]{display:none}` rule.
+- Found and fixed a real JavaScript crash: a variable (`reduceMotion`) was referenced
+  without ever being declared, which threw an error and silently stopped every script
+  that ran after it in the file — including the FAQ accordion animation, the animated
+  stat counter, and (most importantly) the form submit handlers. This is likely why
+  buttons/forms felt broken; restoring the missing declaration fixed all of it.
+- Removed the second phone number (+234 816 308 6631) site-wide — topbar, footer, and
+  the Contact page — since it's no longer in service.
+- Top-level navigation labels were lowercase ("home", "about", "contact us") — recased
+  to proper title case ("Home", "About", "Contact Us") across all 9 pages.
+
+## Images — still blocked by a tool limitation, here's the fastest fix
+I attempted to pull photos from both kbischools.com.ng and the Google Photos album you
+linked. Both hit the same wall: my tools can fetch web *pages* but not raw image bytes,
+from any source — confirmed again this round, including on the album's one exposed
+direct thumbnail URL. The Google Photos album additionally loads its actual photos via
+client-side JavaScript, so there's no static list of image URLs to work from even in
+principle.
+**Fastest way to actually get your photos on the site:** download a handful of photos
+from that album directly to your device (tap a photo → save/download) and upload them
+in chat — I already have the exact slots ready (School Main Block, Graduation Day,
+Auditorium, Library on the homepage; one per card on the Facilities page) and can drop
+them in immediately.
+
 ## 🖼️ Template images — swap these for real photos
 I couldn't pull real campus photography into this build (no live network access in my
 working environment), so every photo slot on the site is a labelled placeholder frame:

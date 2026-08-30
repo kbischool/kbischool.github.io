@@ -486,6 +486,9 @@ footer.site ul li a .icon{width:13px;height:13px;opacity:.8;}
   background:color-mix(in srgb, var(--teal) 14%, transparent);color:var(--teal-text);
   font-size:17px;font-weight:600;display:flex;align-items:center;gap:8px;
 }
+.form-status[hidden]{display:none;}
+.form-status-error{background:color-mix(in srgb, var(--coral) 14%, transparent);color:var(--coral-text);}
+.form-status-error a{text-decoration:underline;color:inherit;}
 .form-status .icon{flex:none;}
 
 /* ============ PHOTO PLACEHOLDER FRAME ============
