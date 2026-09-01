@@ -107,9 +107,23 @@ button{font-family:inherit;}
 .topbar-contacts .seg-muted{display:inline-flex;align-items:center;gap:5px;}
 .topbar-contacts .icon,.topbar-social .icon{color:var(--sky);opacity:.9;}
 .topbar-social{display:flex;gap:14px;align-items:center;}
-.topbar-social a{padding:4px;border-radius:6px;}
+.topbar-social a{padding:8px;border-radius:8px;}
 @media(hover:hover){ .topbar-social a:hover{background:rgba(255,255,255,.08);} }
 .topbar-social .icon{width:15px;height:15px;}
+
+/* Mobile: the full text (phone/email/address) stacked into four rows at ~164px tall
+   was pure dead weight before the header even appeared. Icons carry the same meaning
+   at a fraction of the height, and each link keeps its full text as its aria-label. */
+@media (max-width:680px){
+  .topbar .wrap{flex-wrap:nowrap;gap:8px;padding-top:7px;padding-bottom:7px;}
+  .topbar-contacts{gap:4px;}
+  .topbar-contacts a, .topbar-contacts .seg-muted{padding:7px;border-radius:8px;}
+  .topbar-label{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
+  .topbar-social{gap:2px;}
+}
 
 /* ============ HEADER / NAV ============ */
 header.site{
@@ -157,15 +171,24 @@ nav.primary > ul > li.active > a::after, nav.primary > ul > li.active > button::
 .caret{font-size:14px;opacity:.65;transition:transform .2s ease;}
 nav.primary > ul > li:hover .caret{transform:rotate(180deg);}
 
-.dropdown{
-  position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);
-  background:var(--bg-card);border:1px solid var(--line);box-shadow:var(--shadow-m);border-radius:var(--radius-m);
-  min-width:236px;padding:8px;display:flex;flex-direction:column;gap:1px;z-index:60;
-  opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;
-}
-nav.primary > ul > li:hover .dropdown,
-nav.primary > ul > li:focus-within .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+.dropdown{display:flex;flex-direction:column;gap:1px;z-index:60;}
 .dropdown a{display:block;padding:9px 11px;font-size:17px;font-weight:600;color:var(--ink-soft);border-radius:9px;}
+
+/* Desktop-only dropdown positioning/reveal. Scoped to min-width so it can never
+   leak into the mobile drawer: previously this lived unscoped and its
+   `li:focus-within .dropdown` rule (high specificity, tap = focus on mobile too)
+   beat the mobile reset below, translateX(-50%)-ing the open dropdown 138px off
+   the left edge of the screen the instant its trigger was tapped. */
+@media (min-width: 1301px){
+  .dropdown{
+    position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);
+    background:var(--bg-card);border:1px solid var(--line);box-shadow:var(--shadow-m);border-radius:var(--radius-m);
+    min-width:236px;padding:8px;
+    opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;
+  }
+  nav.primary > ul > li:hover .dropdown,
+  nav.primary > ul > li:focus-within .dropdown{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+}
 @media(hover:hover){ .dropdown a:hover{background:var(--bg-soft);color:var(--ink);} }
 
 .nav-cta{
