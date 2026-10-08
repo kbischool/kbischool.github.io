@@ -1,0 +1,48 @@
+name: Deploy site
+on:
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble site (public files only)
+        run: |
+          mkdir _site
+          cp -r *.html assets sitemap.xml robots.txt site.webmanifest _site/
+      - name: Check links (reports, never blocks)
+        uses: lycheeverse/lychee-action@v2
+        continue-on-error: true
+        with:
+          args: --offline --no-progress --root-dir "$PWD/_site" "_site/**/*.html"
+      - name: Lighthouse report (reports, never blocks)
+        uses: treosh/lighthouse-ci-action@v12
+        continue-on-error: true
+        with:
+          staticDistDir: ./_site
+          uploadArtifacts: true
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: _site }
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
