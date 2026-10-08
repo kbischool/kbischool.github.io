@@ -1,0 +1,78 @@
+/* ============================================================
+   KBI SCHOOLS — PREMIUM LAYER
+   Loaded after style.css. Brand: warm, confident, scholarly —
+   the crest's sky blue on deep ink, amber reserved for actions.
+   Edit the tokens below to re-colour the whole site.
+   ============================================================ */
+:root{
+  --focus:#0A8FB8;
+  --space-1:.5rem;--space-2:1rem;--space-3:1.5rem;--space-4:2.5rem;
+  --dur-fast:160ms;--dur:320ms;--dur-slow:700ms;
+  --z-header:1000;--z-float:900;
+  --font-display:'Sora',system-ui,sans-serif;
+  color-scheme:light dark;
+}
+/* Dark theme: follows the system until the visitor picks one */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B0A1A;--bg-soft:#12112A;--bg-card:#17163A;--ink:#F2F2FA;--ink-soft:#B9B8D4;--ink-faint:#8D8BAE;
+    --line:#2C2B52;--sky-text:#4DD8FF;--sky-pale:#0F2B3B;--focus:#4DD8FF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B0A1A;--bg-soft:#12112A;--bg-card:#17163A;--ink:#F2F2FA;--ink-soft:#B9B8D4;--ink-faint:#8D8BAE;
+  --line:#2C2B52;--sky-text:#4DD8FF;--sky-pale:#0F2B3B;--focus:#4DD8FF;
+}
+body{background:var(--bg);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3{font-family:var(--font-display);letter-spacing:-.025em;line-height:1.12;text-wrap:balance}
+h1{font-size:clamp(2.1rem,5.2vw + .5rem,4rem)}
+h2{font-size:clamp(1.6rem,3vw + .5rem,2.5rem)}
+p{text-wrap:pretty}
+/* Dark-mode fixes for surfaces that hard-code white in style.css */
+:root[data-theme="dark"] .btn-outline,
+:root[data-theme="dark"] header.site{background-color:var(--bg-card)}
+:root[data-theme="dark"] .hero,:root[data-theme="dark"] .page-hero{background:linear-gradient(180deg,var(--sky-pale),var(--bg) 70%)}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .btn-outline,
+  :root:not([data-theme="light"]) header.site{background-color:var(--bg-card)}
+  :root:not([data-theme="light"]) .hero,:root:not([data-theme="light"]) .page-hero{background:linear-gradient(180deg,var(--sky-pale),var(--bg) 70%)}
+}
+/* Header: gains depth once the page scrolls */
+header.site{transition:box-shadow var(--dur) var(--ease-premium),background-color var(--dur)}
+header.site.scrolled{box-shadow:0 8px 30px -14px rgba(21,19,43,.35)}
+/* Cards & buttons */
+.card{transition:transform var(--dur) var(--ease-premium),box-shadow var(--dur) var(--ease-premium),border-color var(--dur)}
+@media (hover:hover){.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-glow)}}
+.btn{transition:transform var(--dur-fast) var(--ease-premium),box-shadow var(--dur) var(--ease-premium)}
+.btn:active{transform:translateY(1px) scale(.98)}
+/* Accessible focus + selection */
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:6px}
+a,button{min-height:0}
+.btn,.nav-cta,button{min-height:var(--tap)}
+/* Scroll reveals — only when JavaScript is running */
+.js .reveal{opacity:0;transform:translateY(18px);transition:opacity var(--dur-slow) var(--ease-premium),transform var(--dur-slow) var(--ease-premium);transition-delay:calc(var(--i,0) * 70ms)}
+.js .reveal.in{opacity:1;transform:none}
+/* Theme toggle */
+.theme-toggle{position:fixed;left:16px;bottom:16px;z-index:var(--z-float);width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--bg-card);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow-m);transition:transform var(--dur-fast) var(--ease-spring)}
+.theme-toggle:hover{transform:rotate(18deg) scale(1.06)}
+.theme-toggle svg{width:22px;height:22px}
+/* Layout safety */
+img,svg,video{max-width:100%}
+@media print{.theme-toggle,.to-top,.scroll-progress,.topbar,header.site{display:none!important}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .js .reveal{opacity:1;transform:none}
+}
+
+/* Always-dark surfaces: style.css uses --ink as a background, which turns light in dark mode */
+:root[data-theme="dark"] .topbar,:root[data-theme="dark"] section.ink,:root[data-theme="dark"] footer.site,:root[data-theme="dark"] .to-top,:root[data-theme="dark"] .skip-link{background:#07061A;color:#C7CBE6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .topbar,:root:not([data-theme="light"]) section.ink,:root:not([data-theme="light"]) footer.site,:root:not([data-theme="light"]) .to-top,:root:not([data-theme="light"]) .skip-link{background:#07061A;color:#C7CBE6}
+}
+/* Header content keeps the page gutter below the desktop breakpoint */
+header.site .wrap.nav-row{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
+@media (max-width:1300px){
+  :root[data-theme="dark"] nav.primary{background:#07061A}
+}
+@media (max-width:1300px) and (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) nav.primary{background:#07061A}
+}
