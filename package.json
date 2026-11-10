@@ -1,0 +1,17 @@
+{
+  "name": "kbischool-github-io",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Static site builder for the Knowledge Base International Schools website. Runs in GitHub Actions; no local setup needed.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node scripts/build.mjs && node scripts/check.mjs"
+  },
+  "devDependencies": {
+    "@fontsource-variable/inter": "^5.2.0",
+    "@fontsource-variable/sora": "^5.2.0"
+  },
+  "engines": { "node": ">=20" }
+}

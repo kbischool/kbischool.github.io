@@ -1,0 +1,43 @@
+name: Pull request check
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Build the site
+        run: npm run build
+        env:
+          SITE_ORIGIN: https://${{ github.repository_owner }}.github.io
+          BASE_PATH: ""
+      - name: Check the build
+        run: npm run check
+      - name: Lighthouse report (mobile, reports only, never blocks)
+        continue-on-error: true
+        uses: treosh/lighthouse-ci-action@12.6.2
+        with:
+          configPath: .lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: false
+      - name: Upload the built site so you can open it
+        uses: actions/upload-artifact@v7
+        with:
+          name: built-site
+          path: dist
+          retention-days: 14

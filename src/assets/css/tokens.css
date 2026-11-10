@@ -1,0 +1,46 @@
+/* ==========================================================================
+   KBI Schools design tokens (generated from an OKLCH palette; hex fallbacks first).
+   Every text/background pair used on the site is >= 4.5:1 in both themes.
+   To retheme the whole site edit this file only.
+   ========================================================================== */
+:root{
+  --bg:#f6fbfd;--surface:#ffffff;--sunken:#ebf4fa;--text:#101a2f;--muted:#485366;--faint:#5f6a7b;--line:#d8e1e8;--line-strong:#b4bfca;--brand:#006f90;--brand-bright:#36defb;--brand-soft:#d3f8ff;--ink:#08112e;--on-ink:#eff6fb;--on-ink-muted:#b0c0d1;--gold:#febf32;--gold-strong:#f5a400;--on-gold:#291600;--success:#006e3b;--warning:#845000;--error:#ba2b2e;--info:#2266a4;--success-soft:#defae6;--warning-soft:#fff2ce;--error-soft:#ffebe8;--info-soft:#e6f4ff;
+  --focus:var(--brand);
+  --font-display:"Sora Variable","Sora",ui-sans-serif,system-ui,sans-serif;
+  --font-body:"Inter Variable","Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --step--1:clamp(.8125rem,.79rem + .1vw,.875rem);
+  --step-0:clamp(1rem,.96rem + .2vw,1.0625rem);
+  --step-1:clamp(1.125rem,1.05rem + .4vw,1.3125rem);
+  --step-2:clamp(1.3rem,1.15rem + .8vw,1.7rem);
+  --step-3:clamp(1.6rem,1.3rem + 1.5vw,2.35rem);
+  --step-4:clamp(2rem,1.5rem + 2.6vw,3.3rem);
+  --step-5:clamp(2.5rem,1.6rem + 4.6vw,5rem);
+  --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.5rem;--space-6:2rem;--space-7:3rem;--space-8:4.5rem;--space-9:7rem;
+  --radius-s:.5rem;--radius-m:.875rem;--radius-l:1.5rem;--radius-pill:999px;
+  --border:1px solid var(--line);
+  --shadow-s:0 1px 2px rgb(8 17 46/.06),0 1px 1px rgb(8 17 46/.04);
+  --shadow-m:0 10px 30px -12px rgb(8 17 46/.18),0 2px 6px rgb(8 17 46/.05);
+  --shadow-l:0 30px 60px -24px rgb(8 17 46/.30),0 8px 18px -8px rgb(8 17 46/.10);
+  --z-base:1;--z-sticky:50;--z-menu:60;--z-toast:80;--z-modal:90;
+  --dur-fast:140ms;--dur:280ms;--dur-slow:640ms;
+  --ease:cubic-bezier(.22,.8,.24,1);--ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --container:72rem;--gutter:clamp(1rem,4vw,2rem);--header-h:4.25rem;--tap:2.75rem;
+  color-scheme:light;
+}
+@supports (color:oklch(0 0 0)){:root{--bg:oklch(0.985 0.006 230);--surface:oklch(1 0 0);--sunken:oklch(0.962 0.012 235);--text:oklch(0.22 0.045 265);--muted:oklch(0.44 0.035 262);--faint:oklch(0.52 0.03 260);--line:oklch(0.905 0.014 240);--line-strong:oklch(0.8 0.02 245);--brand:oklch(0.5 0.105 225);--brand-bright:oklch(0.83 0.135 213);--brand-soft:oklch(0.955 0.04 215);--ink:oklch(0.19 0.06 268);--on-ink:oklch(0.97 0.01 240);--on-ink-muted:oklch(0.8 0.03 250);--gold:oklch(0.84 0.16 82);--gold-strong:oklch(0.78 0.17 75);--on-gold:oklch(0.22 0.05 70);--success:oklch(0.47 0.12 155);--warning:oklch(0.48 0.11 70);--error:oklch(0.52 0.18 25);--info:oklch(0.5 0.12 250);--success-soft:oklch(0.96 0.04 155);--warning-soft:oklch(0.965 0.05 85);--error-soft:oklch(0.96 0.03 25);--info-soft:oklch(0.96 0.025 250);}}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#070e1d;--surface:#11192c;--sunken:#040814;--text:#edf2f8;--muted:#a8b6c8;--faint:#8c9aab;--line:#242d42;--line-strong:#3b4763;--brand:#43ddf9;--brand-bright:#36defb;--brand-soft:#002936;--ink:#020417;--on-ink:#eff6fb;--on-ink-muted:#b0c0d1;--gold:#febf32;--gold-strong:#f5a400;--on-gold:#291600;--success:#6ad895;--warning:#eec05b;--error:#fb817a;--info:#80bdfb;--success-soft:#062f19;--warning-soft:#342707;--error-soft:#431614;--info-soft:#12283e;
+    color-scheme:dark;
+    --shadow-m:0 10px 30px -12px rgb(0 0 0/.55),0 2px 6px rgb(0 0 0/.3);
+    --shadow-l:0 30px 60px -24px rgb(0 0 0/.65),0 8px 18px -8px rgb(0 0 0/.35);
+  }
+  @supports (color:oklch(0 0 0)){:root:not([data-theme="light"]){--bg:oklch(0.165 0.035 266);--surface:oklch(0.215 0.04 266);--sunken:oklch(0.135 0.03 266);--text:oklch(0.96 0.01 250);--muted:oklch(0.77 0.03 255);--faint:oklch(0.68 0.03 255);--line:oklch(0.3 0.04 266);--line-strong:oklch(0.4 0.05 266);--brand:oklch(0.83 0.13 213);--brand-bright:oklch(0.83 0.135 213);--brand-soft:oklch(0.26 0.05 225);--ink:oklch(0.12 0.045 268);--on-ink:oklch(0.97 0.01 240);--on-ink-muted:oklch(0.8 0.03 250);--gold:oklch(0.84 0.16 82);--gold-strong:oklch(0.78 0.17 75);--on-gold:oklch(0.22 0.05 70);--success:oklch(0.8 0.14 155);--warning:oklch(0.83 0.13 85);--error:oklch(0.74 0.15 25);--info:oklch(0.78 0.11 250);--success-soft:oklch(0.27 0.06 155);--warning-soft:oklch(0.28 0.05 85);--error-soft:oklch(0.27 0.07 25);--info-soft:oklch(0.27 0.05 250);}}
+}
+:root[data-theme="dark"]{
+  --bg:#070e1d;--surface:#11192c;--sunken:#040814;--text:#edf2f8;--muted:#a8b6c8;--faint:#8c9aab;--line:#242d42;--line-strong:#3b4763;--brand:#43ddf9;--brand-bright:#36defb;--brand-soft:#002936;--ink:#020417;--on-ink:#eff6fb;--on-ink-muted:#b0c0d1;--gold:#febf32;--gold-strong:#f5a400;--on-gold:#291600;--success:#6ad895;--warning:#eec05b;--error:#fb817a;--info:#80bdfb;--success-soft:#062f19;--warning-soft:#342707;--error-soft:#431614;--info-soft:#12283e;
+  color-scheme:dark;
+  --shadow-m:0 10px 30px -12px rgb(0 0 0/.55),0 2px 6px rgb(0 0 0/.3);
+  --shadow-l:0 30px 60px -24px rgb(0 0 0/.65),0 8px 18px -8px rgb(0 0 0/.35);
+}
+@supports (color:oklch(0 0 0)){:root[data-theme="dark"]{--bg:oklch(0.165 0.035 266);--surface:oklch(0.215 0.04 266);--sunken:oklch(0.135 0.03 266);--text:oklch(0.96 0.01 250);--muted:oklch(0.77 0.03 255);--faint:oklch(0.68 0.03 255);--line:oklch(0.3 0.04 266);--line-strong:oklch(0.4 0.05 266);--brand:oklch(0.83 0.13 213);--brand-bright:oklch(0.83 0.135 213);--brand-soft:oklch(0.26 0.05 225);--ink:oklch(0.12 0.045 268);--on-ink:oklch(0.97 0.01 240);--on-ink-muted:oklch(0.8 0.03 250);--gold:oklch(0.84 0.16 82);--gold-strong:oklch(0.78 0.17 75);--on-gold:oklch(0.22 0.05 70);--success:oklch(0.8 0.14 155);--warning:oklch(0.83 0.13 85);--error:oklch(0.74 0.15 25);--info:oklch(0.78 0.11 250);--success-soft:oklch(0.27 0.06 155);--warning-soft:oklch(0.28 0.05 85);--error-soft:oklch(0.27 0.07 25);--info-soft:oklch(0.27 0.05 250);}}
