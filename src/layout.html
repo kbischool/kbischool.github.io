@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en-NG" data-base="{{base}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://formsubmit.co; frame-src https://www.google.com; form-action 'self' https://formsubmit.co; base-uri 'self'; object-src 'none'; manifest-src 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6fbfd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#070e1d" media="(prefers-color-scheme: dark)">
+{{robots}}
+<link rel="canonical" href="{{canonical}}">
+<link rel="icon" href="{{base}}favicon.ico" sizes="48x48">
+<link rel="icon" href="{{base}}favicon.svg" type="image/svg+xml">
+<link rel="icon" href="{{base}}assets/img/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="{{base}}assets/img/favicon-180.png">
+<link rel="manifest" href="{{base}}site.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="KBI Schools">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Knowledge Base International Schools">
+<meta property="og:locale" content="en_NG">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:url" content="{{canonical}}">
+<meta property="og:image" content="{{site}}{{base}}assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="KBI Schools crest with the motto Knowledge in Humility">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="{{base}}assets/fonts/sora-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{base}}assets/css/site.css?v={{v}}">
+<script src="{{base}}assets/js/theme.js?v={{v}}"></script>
+<script src="{{base}}assets/js/main.js?v={{v}}" defer></script>
+{{jsonld}}
+</head>
+<body>
+<svg class="sr-only" width="0" height="0" aria-hidden="true" focusable="false">
+<symbol id="i-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+<symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4 11 13M19 14v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M4 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L14 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 6a2 2 0 0 1 2-2Z"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 6 8-6"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7.4 7-12.5A7 7 0 0 0 5 9.5C5 14.6 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+<symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M7 17.5 4 20l1.2-3.9A8 8 0 1 1 8.5 19Z"/><path d="M9 10c0 3 2.5 5 5 5M9 10c-.3-1 0-1.6.6-2"/></symbol>
+<symbol id="i-facebook" viewBox="0 0 24 24"><path d="M15 7h2V4h-2a4 4 0 0 0-4 4v2H9v3h2v7h3v-7h2.2l.8-3H14V8a1 1 0 0 1 1-1Z"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></symbol>
+<symbol id="i-instagram" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.5"/><circle cx="16.2" cy="7.8" r=".6" fill="currentColor"/></symbol>
+<symbol id="i-linkedin" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 11v5M8 8v.01M12 16v-3.2c0-1.5 1.1-2.3 2.2-2.300s1.8.8 1.8 2.300V16"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.5-5.2 5.5-5.200s5.5 2.2 5.5 5.2"/><circle cx="17.5" cy="9" r="2.4"/><path d="M15.8 13.600c2 .4 3.7 2.2 3.7 4.5"/></symbol>
+<symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="5"/><path d="m8.5 13-1.7 7 5.2-2.5 5.2 2.5-1.7-7"/></symbol>
+<symbol id="i-cap" viewBox="0 0 24 24"><path d="m2 9 10-4.500L22 9l-10 4.500L2 9Z"/><path d="M6 11v5c0 1.4 2.7 2.5 6 2.500s6-1.1 6-2.500v-5"/></symbol>
+<symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/><rect x="9.5" y="9.5" width="5" height="5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6l-7-3Z"/><path d="m9.5 12 1.8 1.800L15 10"/></symbol>
+<symbol id="i-building" viewBox="0 0 24 24"><rect x="4" y="3" width="11" height="18"/><path d="M15 8h5v13h-5M8 7v.01M11 7v.01M8 11v.01M11 11v.01M8 15v.01M11 15v.01"/></symbol>
+<symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3z"/><path d="M12 10v4.500M12 17.200v.01"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.600M8.2 13.200l7.6 3.6"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.500A2.5 2.5 0 0 1 6.5 3H20v16H6.500A2.5 2.5 0 0 0 4 21.500z"/><path d="M4 21.500v-16M9 7h7"/></symbol>
+<symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L5 19a1.5 1.5 0 0 0 1.3 2h11.400A1.5 1.5 0 0 0 19 19l-5-10V3"/><path d="M7.5 15h9"/></symbol>
+<symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></symbol>
+<symbol id="i-board" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M7 9h6M7 12h9M8 20l2-4M16 20l-2-4"/></symbol>
+<symbol id="i-hall" viewBox="0 0 24 24"><path d="M3 9l9-5 9 5H3zM5 9v9M9.5 9v9M14.5 9v9M19 9v9M3 21h18"/></symbol>
+<symbol id="i-field" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14"/><circle cx="12" cy="12" r="2.8"/></symbol>
+<symbol id="i-cross" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-tablet" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M11 18.500h2"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-5 4 5 4M16 8l5 4-5 4M14 5l-4 14"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+</svg>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="container header-bar">
+    <a class="brand" href="{{base}}">
+      <img src="{{base}}assets/img/logo-96.webp" width="46" height="48" alt="">
+      <span class="brand-text"><span class="brand-name">KBI Schools</span><span class="brand-motto">Knowledge in Humility</span></span>
+    </a>
+    <nav id="site-nav" class="nav" aria-label="Primary">
+      <ul class="nav-list">
+        <li><a class="nav-link" href="{{base}}"{{current:home}}>Home</a></li>
+        <li><details class="nav-group{{group:about}}"><summary>About</summary><div class="nav-panel">
+          <a href="{{base}}about.html#about-us">About us</a><a href="{{base}}about.html#history">Our history</a><a href="{{base}}about.html#values">Our values</a><a href="{{base}}about.html#management">Management and staff</a><a href="{{base}}about.html#management-history">Management history</a><a href="{{base}}about.html#prefects">Prefects</a></div></details></li>
+        <li><details class="nav-group{{group:admission}}"><summary>Admission</summary><div class="nav-panel">
+          <a href="{{base}}admission.html#prospectus">Prospectus</a><a href="{{base}}admission.html#procedure">Application procedure</a><a href="{{base}}admission.html#apply">Apply here</a><a href="{{base}}admission.html#faq">Common questions</a></div></details></li>
+        <li><details class="nav-group{{group:academics}}"><summary>Academics</summary><div class="nav-panel">
+          <a href="{{base}}academics.html#curriculum">Curriculum</a><a href="{{base}}academics.html#classes">Classes</a><a href="{{base}}academics.html#subjects">Subjects</a><a href="{{base}}academics.html#practicals">Practicals</a><a href="{{base}}academics.html#timetables">Timetables</a><a href="{{base}}academics.html#calendar">School calendar</a><a href="{{base}}academics.html#exams">External examinations</a></div></details></li>
+        <li><a class="nav-link" href="{{base}}facilities.html"{{current:facilities}}>Facilities</a></li>
+        <li><details class="nav-group{{group:ict}}"><summary>ICT</summary><div class="nav-panel">
+          <a href="{{base}}ict.html#education">ICT education</a><a href="{{base}}ict.html#portals">E-portals</a><a href="{{base}}ict.html#payments">E-payments</a><a href="{{base}}ict.html#cbt">Computer-based testing</a><a href="{{base}}ict.html#results">E-results</a></div></details></li>
+        <li><a class="nav-link" href="{{base}}alumni.html"{{current:alumni}}>Alumni</a></li>
+        <li><a class="nav-link" href="{{base}}news.html"{{current:news}}>News &amp; events</a></li>
+        <li><a class="nav-link" href="{{base}}contact.html"{{current:contact}}>Contact</a></li>
+      </ul>
+      <a class="btn btn-primary nav-cta" href="{{base}}admission.html#apply">Apply now</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-contrast"/></svg></button>
+      <a class="btn btn-primary btn-sm" href="{{base}}admission.html#apply">Apply now</a>
+      <button class="icon-btn burger" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-nav" aria-label="Open menu"><svg class="icon icon-open" aria-hidden="true"><use href="#i-menu"/></svg><svg class="icon icon-close" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+  </div>
+</header>
+<div class="offline-banner" data-offline-banner role="status" hidden>You are offline. Pages you have already visited still work.</div>
+<main id="main" tabindex="-1">
+{{content}}
+</main>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><img src="{{base}}assets/img/logo-96.webp" width="44" height="46" alt="" loading="lazy"><span>KBI Schools</span></div>
+        <p>Knowledge Base International Schools is a private school in Moniya, Ibadan, teaching Crèche through Senior Secondary (KBI College) since 2012.</p>
+        <div class="social mt-4">
+          <a href="https://www.facebook.com/kbischoolsibadan/" target="_blank" rel="noopener noreferrer" aria-label="KBI Schools on Facebook (opens in a new tab)"><svg class="icon" aria-hidden="true"><use href="#i-facebook"/></svg></a>
+          <a href="https://x.com/kbi_schools" target="_blank" rel="noopener noreferrer" aria-label="KBI Schools on X (opens in a new tab)"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></a>
+          <a href="https://www.instagram.com/kbi_schools/" target="_blank" rel="noopener noreferrer" aria-label="KBI Schools on Instagram (opens in a new tab)"><svg class="icon" aria-hidden="true"><use href="#i-instagram"/></svg></a>
+          <a href="https://www.linkedin.com/company/knowledge-base-international-schools/" target="_blank" rel="noopener noreferrer" aria-label="KBI Schools on LinkedIn (opens in a new tab)"><svg class="icon" aria-hidden="true"><use href="#i-linkedin"/></svg></a>
+          <a href="https://wa.me/2348126909498" target="_blank" rel="noopener noreferrer" aria-label="Message KBI Schools on WhatsApp (opens in a new tab)"><svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <h2>Explore</h2>
+        <ul class="footer-list">
+          <li><a href="{{base}}about.html">About us</a></li><li><a href="{{base}}admission.html">Admission</a></li><li><a href="{{base}}academics.html">Academics</a></li><li><a href="{{base}}facilities.html">Facilities</a></li><li><a href="{{base}}ict.html">ICT</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Community</h2>
+        <ul class="footer-list">
+          <li><a href="{{base}}alumni.html">Alumni</a></li><li><a href="{{base}}news.html">News &amp; events</a></li><li><a href="{{base}}contact.html">Contact us</a></li><li><a href="{{base}}admission.html#apply">Apply now</a></li>
+          <li><a href="https://kbischools.com.ng/signin" target="_blank" rel="noopener noreferrer">Portal login<span class="sr-only"> (opens in a new tab)</span></a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Contact</h2>
+        <ul class="footer-list">
+          <li><a href="tel:+2348126909498">+234 812 690 9498</a></li>
+          <li><a href="mailto:knowledgebaseschools@gmail.com">knowledgebaseschools@gmail.com</a></li>
+          <li>15, Okikiolu Haven, Opposite IDC Primary School, Apapa Area, Moniya, Ibadan, Oyo State</li>
+        </ul>
+        <button class="btn btn-on-ink btn-sm mt-4 install-prompt-hide" type="button" data-install hidden>Install the app</button>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; <span data-year>{{year}}</span> Knowledge Base International Schools. All rights reserved.</span>
+      <span>Website by <a href="https://github.com/babatundeawo" target="_blank" rel="noopener noreferrer">Techbase Consultant Services</a></span>
+    </div>
+  </div>
+</footer>
+<button class="icon-btn to-top" type="button" data-to-top aria-label="Back to top"><svg class="icon" aria-hidden="true"><use href="#i-arrow-up"/></svg></button>
+<dialog id="ios-guide" aria-labelledby="ios-guide-title">
+  <h2 id="ios-guide-title">Add KBI Schools to your iPhone</h2>
+  <p class="muted mt-3">iPhones have no install button, but it only takes three taps in Safari.</p>
+  <ol class="steps">
+    <li><h3>Tap the Share button</h3><p>It is the square with an arrow pointing up, at the bottom of the screen (or the top on iPad).</p></li>
+    <li><h3>Choose &ldquo;Add to Home Screen&rdquo;</h3><p>Scroll down the list of options until you see it.</p></li>
+    <li><h3>Tap &ldquo;Add&rdquo;</h3><p>The KBI Schools crest now appears on your home screen like any other app.</p></li>
+  </ol>
+  <div class="row"><button class="btn btn-primary" type="button" data-close-dialog>Got it</button></div>
+</dialog>
+</body>
+</html>

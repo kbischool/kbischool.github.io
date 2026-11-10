@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://kbischool.github.io/sitemap.xml
