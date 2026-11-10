@@ -123,9 +123,13 @@
   $$('[data-map-load]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var box = btn.closest('.map-box'), f = doc.createElement('iframe');
+      var MAP_ORIGIN = 'https://www.google.com/maps';
+      var want = btn.getAttribute('data-map-src') || '';
+      /* Only ever load a Google Maps address; anything else falls back to the plain link beside the button. */
+      if (want.indexOf(MAP_ORIGIN + '?') !== 0) return;
       f.title = 'Map showing KBI Schools in Moniya, Ibadan';
       f.loading = 'lazy'; f.referrerPolicy = 'no-referrer-when-downgrade';
-      f.src = btn.getAttribute('data-map-src');
+      f.setAttribute('src', MAP_ORIGIN + want.slice(MAP_ORIGIN.length));
       box.textContent = ''; box.classList.add('is-loaded'); box.appendChild(f);
     });
   });
