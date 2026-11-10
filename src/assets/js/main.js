@@ -120,16 +120,13 @@
   window.addEventListener('resize', updatePathway, { passive: true });
 
   /* ---- Click-to-load map (no third-party request until asked) --------- */
+  var MAP_URL = 'https://www.google.com/maps?q=15+Okikiolu+Haven+Moniya+Ibadan&output=embed';
   $$('[data-map-load]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var box = btn.closest('.map-box'), f = doc.createElement('iframe');
-      var MAP_ORIGIN = 'https://www.google.com/maps';
-      var want = btn.getAttribute('data-map-src') || '';
-      /* Only ever load a Google Maps address; anything else falls back to the plain link beside the button. */
-      if (want.indexOf(MAP_ORIGIN + '?') !== 0) return;
       f.title = 'Map showing KBI Schools in Moniya, Ibadan';
       f.loading = 'lazy'; f.referrerPolicy = 'no-referrer-when-downgrade';
-      f.setAttribute('src', MAP_ORIGIN + want.slice(MAP_ORIGIN.length));
+      f.src = MAP_URL;
       box.textContent = ''; box.classList.add('is-loaded'); box.appendChild(f);
     });
   });
