@@ -5,7 +5,7 @@ Facts and photos still waiting for confirmation from the school. These used to a
 ## Needs confirmation before you rely on it
 
 - Administrator's and Bursar's real names and photos (current name in use: Bukola Christiana Adebunmi)
-- Pearce Folorunsho's title (shown as School Consultant) and whether Babatunde Awoyemi's public title is "Consultant", "Manager" or "Lead Consultant". The site uses "Consultant / Manager" on About and "Lead Consultant" in the homepage message
+- Whether Babatunde Awoyemi's public title is "Consultant", "Manager" or "Lead Consultant". The staff table says "School Consultant", the Board card on About says "Consultant / Manager" and the homepage message says "Lead Consultant"
 - PTA Chairman (the staff table says "To be confirmed")
 - Official Mission and Vision wording, if the board has an approved version
 - The founding story: founders, first location, first graduating class
