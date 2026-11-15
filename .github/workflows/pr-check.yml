@@ -21,6 +21,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - name: Portal unit tests (scoring, attendance, student rules, screens)
+        run: npm run test:portal
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Portal security-rules tests (Firebase emulator)
+        run: npm run test:rules
       - name: Build the site
         run: npm run build
         env:

@@ -1,0 +1,257 @@
+// Firestore rules tests. Run inside GitHub Actions (npm run test:rules) with the Firebase emulator.
+import { describe, it, beforeAll, afterAll, beforeEach } from "vitest";
+import { initializeTestEnvironment, assertFails, assertSucceeds } from "@firebase/rules-unit-testing";
+import { readFileSync } from "node:fs";
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, getDocs, query, collection, where, writeBatch } from "firebase/firestore";
+
+let env;
+// Whatever UID is in the file (the placeholder or the real owner's), the tests use their own owner, "owner1".
+const rules = readFileSync(new URL("../firestore.rules", import.meta.url), "utf8").replace(/function ownerUid\(\) \{ return '[^']*'; \}/, "function ownerUid() { return 'owner1'; }");
+if (!rules.includes("return 'owner1'")) throw new Error("Could not find ownerUid() in firestore.rules");
+const as = (uid, claims = {}) => env.authenticatedContext(uid, { email_verified: true, email: `${uid}@example.com`, ...claims }).firestore();
+const T = (extra) => ({ role: "teacher", schoolId: "s1", status: "active", classKeys: [], assignments: [], classTeacherKey: null, ...extra });
+
+beforeAll(async () => { env = await initializeTestEnvironment({ projectId: "termbook-test", firestore: { rules } }); });
+afterAll(async () => { await env.cleanup(); });
+beforeEach(async () => {
+  await env.clearFirestore();
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    const seed = {
+      "config/platform": { requireVerification: true },
+      "publicSchools/s1": { name: "One", state: "Lagos", lga: "Ikeja" },
+      "schools/s1": { adminUid: "adm1", status: "verified", name: "One" },
+      "schools/s2": { adminUid: "adm2", status: "verified", name: "Two" },
+      "users/adm1": { uid: "adm1", role: "admin", schoolId: "s1", status: "active" },
+      "users/adm2": { uid: "adm2", role: "admin", schoolId: "s2", status: "active" },
+      "users/pending": { uid: "pending", ...T({ status: "pending" }) },
+      "users/ctch": { uid: "ctch", ...T({ classTeacherKey: "SS1|A", classKeys: ["SS1|A"] }) },
+      "users/subj": { uid: "subj", ...T({ assignments: ["Mathematics|SS2|A"], classKeys: ["SS2|A"] }) },
+      "users/other": { uid: "other", ...T({ schoolId: "s2", classTeacherKey: "SS1|A", classKeys: ["SS1|A"] }) },
+      "users/parent1": { uid: "parent1", role: "parent", status: "active" },
+      "users/parent2": { uid: "parent2", role: "parent", status: "active" },
+      "users/stud1": { uid: "stud1", role: "student", status: "active" },
+      "schools/s1/links/stud1_st1": { uid: "stud1", studentId: "st1", code: "ABC123" },
+      "schools/s1/students/st1": { name: "A", classKey: "SS2|A", class: "SS2", arm: "A", admissionNo: "A1", status: "active" },
+      "schools/s1/students/st2": { name: "B", classKey: "SS1|A", class: "SS1", arm: "A", admissionNo: "B1", status: "active" },
+      "schools/s1/students/st1/private/info": { religion: "x", phone: "0803" },
+      "schools/s1/accessCodes/st1": { code: "ABC123", active: true, studentId: "st1" },
+      "schools/s1/terms/t1": { published: false },
+      "schools/s1/terms/t2": { published: true },
+      "schools/s1/links/parent1_st1": { uid: "parent1", studentId: "st1", code: "ABC123" },
+      "schools/s1/reports/t1_st1": { termId: "t1", studentId: "st1", classKey: "SS2|A" },
+      "schools/s1/reports/t2_st1": { termId: "t2", studentId: "st1", classKey: "SS2|A" },
+      "schools/s1/studentAttendance/2026-2027_st1": { studentId: "st1", classKey: "SS2|A", session: "2026/2027", d: { "2026-09-21": 3 } },
+      "users/ct2": { uid: "ct2", ...T({ classTeacherKey: "SS2|A", classKeys: ["SS2|A"] }) },
+      "schools/s1/sheets/math": { subject: "Mathematics", classKey: "SS2|A", scores: {} },
+      "schools/s1/sheets/eng": { subject: "English", classKey: "SS2|A", scores: {} },
+    };
+    for (const [p, d] of Object.entries(seed)) await setDoc(doc(db, p), d);
+  });
+});
+
+describe("required rules", () => {
+  it("a teacher cannot read another school", async () => {
+    const db = as("other");
+    await assertFails(getDoc(doc(db, "schools/s1")));
+    await assertFails(getDoc(doc(db, "schools/s1/students/st2")));
+    await assertFails(getDocs(query(collection(db, "schools/s1/students"), where("classKey", "==", "SS1|A"))));
+  });
+  it("an unapproved teacher reads nothing", async () => {
+    const db = as("pending");
+    await assertFails(getDoc(doc(db, "schools/s1")));
+    await assertFails(getDoc(doc(db, "schools/s1/students/st1")));
+    await assertFails(getDoc(doc(db, "schools/s1/sheets/math")));
+  });
+  it("a class teacher cannot write scores", async () => {
+    await assertFails(updateDoc(doc(as("ctch"), "schools/s1/sheets/math"), { scores: { 1: {} } }));
+  });
+  it("a subject teacher cannot write another subject's scores, but can write their own", async () => {
+    const db = as("subj");
+    await assertFails(updateDoc(doc(db, "schools/s1/sheets/eng"), { scores: { 1: {} } }));
+    await assertSucceeds(updateDoc(doc(db, "schools/s1/sheets/math"), { scores: { 1: { st1: { a: 5 } } } }));
+  });
+  it("a parent sees only the linked child, and only published results", async () => {
+    const db = as("parent1");
+    await assertSucceeds(getDoc(doc(db, "schools/s1/students/st1")));
+    await assertFails(getDoc(doc(db, "schools/s1/students/st2")));
+    await assertSucceeds(getDoc(doc(db, "schools/s1/students/st1/private/info")));   // parents can read their own child's private details
+    await assertFails(getDoc(doc(db, "schools/s1/reports/t1_st1")));
+    await assertSucceeds(getDoc(doc(db, "schools/s1/reports/t2_st1")));
+    await assertFails(getDoc(doc(db, "schools/s1/sheets/math")));
+  });
+});
+
+describe("student management", () => {
+  it("the school admin can promote and tag a student as no longer in school; another school's admin cannot", async () => {
+    await assertSucceeds(updateDoc(doc(as("adm1"), "schools/s1/students/st1"), { class: "SS3", classKey: "SS3|A", status: "active" }));
+    await assertSucceeds(updateDoc(doc(as("adm1"), "schools/s1/students/st2"), { status: "left", leftReason: "Withdrawn" }));
+    await assertFails(updateDoc(doc(as("adm2"), "schools/s1/students/st1"), { status: "left" }));
+  });
+  it("the owner can read and edit any school's students", async () => {
+    await assertSucceeds(getDoc(doc(as("owner1"), "schools/s1/students/st1")));
+    await assertSucceeds(updateDoc(doc(as("owner1"), "schools/s1/students/st1"), { status: "left" }));
+  });
+  it("students are never hard-deleted, even by the admin", async () => {
+    await assertFails(deleteDoc(doc(as("adm1"), "schools/s1/students/st1")));
+  });
+  it("a class teacher adds pending students to their own class only and cannot change status", async () => {
+    const db = as("ctch");
+    await assertSucceeds(setDoc(doc(db, "schools/s1/students/new1"), { name: "N", classKey: "SS1|A", status: "pending" }));
+    await assertFails(setDoc(doc(db, "schools/s1/students/new2"), { name: "N", classKey: "SS1|A", status: "active" }));
+    await assertFails(setDoc(doc(db, "schools/s1/students/new3"), { name: "N", classKey: "SS2|A", status: "pending" }));
+    await assertFails(updateDoc(doc(db, "schools/s1/students/st2"), { status: "left" }));
+  });
+  it("a class teacher can add a pending student together with private details in one batch, and the admin can then see it", async () => {
+    const db = as("ctch"); const b = writeBatch(db);
+    b.set(doc(db, "schools/s1/students/new9"), { name: "N", classKey: "SS1|A", status: "pending", admissionNo: "N9" });
+    b.set(doc(db, "schools/s1/students/new9/private/info"), { address: "x", phone: "0803" });
+    await assertSucceeds(b.commit());
+    await assertSucceeds(getDoc(doc(as("adm1"), "schools/s1/students/new9")));
+    const other = writeBatch(db);
+    other.set(doc(db, "schools/s1/students/new8"), { name: "N", classKey: "SS2|A", status: "pending" });
+    other.set(doc(db, "schools/s1/students/new8/private/info"), { address: "x" });
+    await assertFails(other.commit());
+  });
+  it("a class teacher can correct the name of a student in their own class, but not in another class", async () => {
+    const db = as("ctch");
+    await assertSucceeds(updateDoc(doc(db, "schools/s1/students/st2"), { name: "B CORRECTED" }));
+    await assertFails(updateDoc(doc(db, "schools/s1/students/st1"), { name: "NOT MY CLASS" }));
+    await assertFails(updateDoc(doc(as("subj"), "schools/s1/students/st1"), { name: "SUBJECT TEACHER" }));
+  });
+  it("class teachers and admins can correct admission numbers in their class; a parent can look up one number but not list", async () => {
+    const ct = as("ctch");
+    await assertSucceeds(updateDoc(doc(ct, "schools/s1/students/st2"), { admissionNo: "B9" }));
+    await assertSucceeds(setDoc(doc(ct, "schools/s1/admissionIndex/B9"), { studentId: "st2" }));
+    await assertFails(setDoc(doc(ct, "schools/s1/admissionIndex/B9"), { studentId: "st1" })); // cannot overwrite
+    await assertFails(setDoc(doc(ct, "schools/s1/admissionIndex/st1"), { studentId: "st2" })); // that number already belongs to a student
+    await assertFails(updateDoc(doc(ct, "schools/s1/students/st1"), { admissionNo: "Z1" })); // not their class
+    await assertFails(setDoc(doc(ct, "schools/s1/admissionIndex/Z1"), { studentId: "st1" }));
+    await assertSucceeds(setDoc(doc(as("adm1"), "schools/s1/admissionIndex/Z2"), { studentId: "st1" }));
+    await assertSucceeds(getDoc(doc(as("parent1"), "schools/s1/admissionIndex/B9")));
+    await assertFails(getDocs(collection(as("parent1"), "schools/s1/admissionIndex")));
+    await assertFails(setDoc(doc(as("parent1"), "schools/s1/admissionIndex/X1"), { studentId: "st1" }));
+    await assertFails(getDoc(doc(as("other"), "schools/s1/admissionIndex/B9")));
+  });
+  it("a class teacher writes ratings and the tutor's comment for their own class; only the admin writes the principal's comment", async () => {
+    const ct = as("ctch"), r = (id) => doc(ct, `schools/s1/remarks/${id}`);
+    await assertSucceeds(setDoc(r("t1_st2"), { studentId: "st2", classKey: "SS1|A", termId: "t1", ratings: { punctuality: 5 }, tutorComment: "Good" }));
+    await assertSucceeds(updateDoc(r("t1_st2"), { tutorComment: "Better", ratings: { punctuality: 4 } }));
+    await assertFails(updateDoc(r("t1_st2"), { principalComment: "Hacked" }));
+    await assertFails(setDoc(r("t1_new"), { studentId: "st2", classKey: "SS1|A", termId: "t1", principalComment: "No" }));
+    await assertFails(setDoc(r("t1_st1"), { studentId: "st1", classKey: "SS2|A", termId: "t1", tutorComment: "Other class" }));
+    await assertFails(setDoc(r("t1_lie"), { studentId: "st1", classKey: "SS1|A", termId: "t1" })); // claims the wrong class for that student
+    await assertSucceeds(setDoc(doc(as("adm1"), "schools/s1/remarks/t1_st2"), { studentId: "st2", classKey: "SS1|A", termId: "t1", principalComment: "Well done" }, { merge: true }));
+    await assertFails(getDoc(doc(as("parent1"), "schools/s1/remarks/t1_st2")));
+    await assertFails(getDoc(doc(as("subj"), "schools/s1/remarks/t1_st2")));
+  });
+  it("only the admin changes report card branding; it is allowed on the school record", async () => {
+    await assertSucceeds(updateDoc(doc(as("adm1"), "schools/s1"), { report: { heading: "X" }, branding: { logo: "data:image/png;base64,AA" } }));
+    await assertFails(updateDoc(doc(as("ctch"), "schools/s1"), { report: { heading: "Y" } }));
+    await assertSucceeds(updateDoc(doc(as("adm1"), "publicSchools/s1"), { name: "One", state: "Lagos", lga: "Ikeja", branding: { logo: "data:image/png;base64,AA" } }));
+  });
+  it("a linked parent can read and edit the family, health and emergency details of their own child only", async () => {
+    const p = as("parent1"), info = (db, id) => doc(db, `schools/s1/students/${id}/private/info`);
+    await assertSucceeds(getDoc(info(p, "st1")));
+    await assertSucceeds(setDoc(info(p, "st1"), { allergies: "Peanuts", emergencyName: "Aunt Ade", genotype: "AS", updatedByRole: "parent" }, { merge: true }));
+    await assertFails(setDoc(info(p, "st1"), { allergies: "x", isAdmin: true }, { merge: true }));          // only the listed detail fields
+    await assertFails(getDoc(info(p, "st2"))); await assertFails(setDoc(info(p, "st2"), { allergies: "x" }, { merge: true })); // another child
+    await assertFails(getDoc(info(as("parent2"), "st1")));                                                  // not linked
+    await assertFails(updateDoc(doc(p, "schools/s1/students/st1"), { name: "CHANGED" }));                   // identity stays with the school
+    await assertSucceeds(getDoc(info(as("ct2"), "st1")));                                                   // the class teacher sees what the parent entered
+    await assertFails(getDoc(info(as("subj"), "st1")));
+  });
+  it("a parent reads only their own child's attendance record and cannot change it; the class teacher keeps it", async () => {
+    const rec = (db, id) => doc(db, `schools/s1/studentAttendance/${id}`);
+    await assertSucceeds(getDoc(rec(as("parent1"), "2026-2027_st1")));
+    await assertFails(getDoc(rec(as("parent2"), "2026-2027_st1")));
+    await assertFails(setDoc(rec(as("parent1"), "2026-2027_st1"), { studentId: "st1", classKey: "SS2|A", d: { "2026-09-22": 3 } }, { merge: true }));
+    await assertSucceeds(setDoc(rec(as("ct2"), "2026-2027_st1"), { studentId: "st1", classKey: "SS2|A", d: { "2026-09-22": 3 } }, { merge: true }));
+    await assertSucceeds(setDoc(rec(as("ctch"), "2026-2027_st2"), { studentId: "st2", classKey: "SS1|A", d: { "2026-09-21": 1 } }));
+    await assertFails(setDoc(rec(as("ctch"), "2026-2027_x"), { studentId: "st1", classKey: "SS2|A", d: {} }));  // not their class
+    await assertFails(getDoc(rec(as("subj"), "2026-2027_st1")));
+  });
+  it("a parent can leave an absence note for their own child; only that class's teacher and the parent read it", async () => {
+    const note = (db, id) => doc(db, `schools/s1/absenceNotes/${id}`); const base = { studentId: "st1", classKey: "SS2|A", date: "2026-09-21", reason: "Malaria", uid: "parent1" };
+    await assertSucceeds(setDoc(note(as("parent1"), "st1_2026-09-21"), base));
+    await assertFails(setDoc(note(as("parent2"), "st1_2026-09-22"), { ...base, date: "2026-09-22", uid: "parent2" })); // not linked
+    await assertFails(setDoc(note(as("parent1"), "wrong-id"), base));
+    await assertFails(setDoc(note(as("parent1"), "st1_2026-09-23"), { ...base, date: "2026-09-23", extra: 1 }));
+    await assertSucceeds(updateDoc(note(as("parent1"), "st1_2026-09-21"), { reason: "Fever" }));
+    await assertSucceeds(getDoc(note(as("parent1"), "st1_2026-09-21"))); await assertSucceeds(getDoc(note(as("ct2"), "st1_2026-09-21")));
+    await assertFails(getDoc(note(as("ctch"), "st1_2026-09-21"))); await assertFails(getDoc(note(as("parent2"), "st1_2026-09-21")));
+    await assertSucceeds(deleteDoc(note(as("parent1"), "st1_2026-09-21")));
+  });
+  it("only the owner can replace a school's admin", async () => {
+    await assertSucceeds(updateDoc(doc(as("owner1"), "users/ctch"), { role: "admin", schoolId: "s1", status: "active" }));
+    await assertSucceeds(updateDoc(doc(as("owner1"), "users/adm1"), { status: "removed" }));
+    await assertSucceeds(updateDoc(doc(as("owner1"), "schools/s1"), { adminUid: "ctch" }));
+    await assertFails(getDoc(doc(as("adm1"), "schools/s1")));                                            // the removed admin loses access straight away
+    await assertSucceeds(getDoc(doc(as("ctch"), "schools/s1")));                                         // and the new admin has it
+  });
+  it("an admin cannot hand their school to someone else or promote a teacher", async () => {
+    const a = as("adm1");
+    await assertFails(updateDoc(doc(a, "schools/s1"), { adminUid: "ctch" }));
+    await assertFails(updateDoc(doc(a, "users/ctch"), { role: "admin" }));
+    await assertFails(updateDoc(doc(as("ctch"), "users/ctch"), { role: "admin" }));
+  });
+  it("a subject teacher can list only the classes they teach", async () => {
+    const db = as("subj");
+    await assertSucceeds(getDocs(query(collection(db, "schools/s1/students"), where("classKey", "==", "SS2|A"))));
+    await assertFails(getDocs(query(collection(db, "schools/s1/students"), where("classKey", "==", "SS1|A"))));
+  });
+});
+
+describe("accounts and links", () => {
+  it("a teacher cannot approve themselves or change their roles", async () => {
+    await assertFails(updateDoc(doc(as("pending"), "users/pending"), { status: "active" }));
+    await assertFails(updateDoc(doc(as("ctch"), "users/ctch"), { classKeys: ["SS3|A"] }));
+  });
+  it("the admin can approve a teacher in their school only", async () => {
+    await assertSucceeds(updateDoc(doc(as("adm1"), "users/pending"), { status: "active", classKeys: ["JSS1|A"], classTeacherKey: "JSS1|A" }));
+    await assertFails(updateDoc(doc(as("adm2"), "users/pending"), { status: "active" }));
+  });
+  it("nobody can register as the owner", async () => {
+    await assertFails(setDoc(doc(as("rando"), "users/rando"), { uid: "rando", role: "owner", status: "active" }));
+    await assertSucceeds(setDoc(doc(as("owner1"), "users/owner1"), { uid: "owner1", role: "owner", status: "active" }));
+  });
+  it("an unverified email gets no access", async () => {
+    const db = env.authenticatedContext("adm1", { email_verified: false }).firestore();
+    await assertFails(getDoc(doc(db, "schools/s1")));
+  });
+  it("a parent links only with the right code, and the code is never readable", async () => {
+    const db = as("parent2");
+    await assertFails(setDoc(doc(db, "schools/s1/links/parent2_st1"), { uid: "parent2", studentId: "st1", code: "WRONG" }));
+    await assertFails(getDoc(doc(db, "schools/s1/accessCodes/st1")));
+    await assertSucceeds(setDoc(doc(db, "schools/s1/links/parent2_st1"), { uid: "parent2", studentId: "st1", code: "ABC123" }));
+  });
+  it("revoking a link removes the parent's access", async () => {
+    await assertSucceeds(deleteDoc(doc(as("adm1"), "schools/s1/links/parent1_st1")));
+    await assertFails(getDoc(doc(as("parent1"), "schools/s1/students/st1")));
+  });
+  it("audit entries can be added but never edited or deleted", async () => {
+    const db = as("adm1");
+    await assertSucceeds(setDoc(doc(db, "audit/a1"), { uid: "adm1", schoolId: "s1", action: "x" }));
+    await assertFails(updateDoc(doc(db, "audit/a1"), { action: "y" }));
+    await assertFails(deleteDoc(doc(db, "audit/a1")));
+  });
+
+  it("a linked student reads only their own record, attendance and published report; cannot write or see private details or notes", async () => {
+    const s = as("stud1");
+    await assertSucceeds(getDoc(doc(s, "schools/s1/students/st1")));
+    await assertFails(getDoc(doc(s, "schools/s1/students/st2")));
+    await assertSucceeds(getDoc(doc(s, "schools/s1/studentAttendance/2026-2027_st1")));
+    await assertFails(getDoc(doc(s, "schools/s1/students/st1/private/info")));
+    await assertFails(setDoc(doc(s, "schools/s1/students/st1/private/info"), { allergies: "None", updatedByRole: "student" }, { merge: true }));
+    await assertFails(setDoc(doc(s, "schools/s1/absenceNotes/st1_2026-09-21"), { studentId: "st1", classKey: "SS2|A", date: "2026-09-21", reason: "x", uid: "stud1" }));
+    await assertFails(setDoc(doc(s, "schools/s1/studentAttendance/2026-2027_st1"), { studentId: "st1", classKey: "SS2|A", d: {} }, { merge: true }));
+    await assertFails(updateDoc(doc(s, "schools/s1/students/st1"), { name: "Changed" }));
+    await assertFails(getDocs(collection(s, "schools/s1/students")));
+  });
+
+  it("a student can create their own account profile but not an admin or teacher one", async () => {
+    const u = as("newstud");
+    await assertSucceeds(setDoc(doc(u, "users/newstud"), { uid: "newstud", role: "student", status: "active", email: "s@x.com" }));
+    await assertFails(setDoc(doc(as("bad1"), "users/bad1"), { uid: "bad1", role: "owner", status: "active" }));
+  });
+});

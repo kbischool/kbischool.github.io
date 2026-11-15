@@ -1,0 +1,10 @@
+// Service worker for the KBI Portal: caches the app shell so it opens offline. Scope is /portal/ only.
+const CACHE = "portal-shell-v1";
+const SHELL = ["./", "css/tokens.css", "css/base.css", "css/app.css", "js/theme-init.js", "favicon.svg", "assets/icons/logo.webp", "manifest.webmanifest", "assets/fonts/plus-jakarta-sans-latin-400-normal.woff2", "assets/fonts/plus-jakarta-sans-latin-600-normal.woff2", "assets/fonts/plus-jakarta-sans-latin-800-normal.woff2", "assets/fonts/young-serif-latin-400-normal.woff2"];
+self.addEventListener("install", (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())); });
+self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((k) => Promise.all(k.filter((n) => n !== CACHE).map((n) => caches.delete(n)))).then(() => self.clients.claim())); });
+self.addEventListener("fetch", (e) => {
+  const r = e.request; if (r.method !== "GET" || new URL(r.url).origin !== location.origin) return;
+  if (r.mode === "navigate") { e.respondWith(fetch(r).then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(r, copy)); return res; }).catch(() => caches.match(r).then((m) => m || caches.match("./")))); return; }
+  e.respondWith(caches.match(r).then((m) => m || fetch(r).then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(r, copy)); return res; })));
+});
