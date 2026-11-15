@@ -196,7 +196,7 @@ const manifest = {
   shortcuts: [
     { name: 'Apply for admission', short_name: 'Apply', url: `${base}admission.html#apply`, icons: [{ src: `${base}assets/img/favicon-192.png`, sizes: '192x192', type: 'image/png' }] },
     { name: 'News and events', short_name: 'News', url: `${base}news.html`, icons: [{ src: `${base}assets/img/favicon-192.png`, sizes: '192x192', type: 'image/png' }] },
-    { name: 'Portals and ICT', short_name: 'Portals', url: `${base}ict.html#portals`, icons: [{ src: `${base}assets/img/favicon-192.png`, sizes: '192x192', type: 'image/png' }] },
+    { name: 'KBI Schools Portal', short_name: 'Portal', url: `${base}portal.html`, icons: [{ src: `${base}assets/img/favicon-192.png`, sizes: '192x192', type: 'image/png' }] },
     { name: 'Contact the school', short_name: 'Contact', url: `${base}contact.html`, icons: [{ src: `${base}assets/img/favicon-192.png`, sizes: '192x192', type: 'image/png' }] }
   ]
 };
