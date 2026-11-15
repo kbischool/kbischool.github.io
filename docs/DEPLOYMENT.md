@@ -46,9 +46,9 @@ With GitHub Desktop: click **Fetch origin**, edit the file in any text editor, t
 2. Click **Revert**. GitHub opens a new pull request that undoes it.
 3. Click **Create pull request**, then **Merge pull request**. The old version is published again in about a minute.
 
-## The enquiry forms
+## The contact, enquiry and registration forms
 
-Both forms send through FormSubmit to knowledgebaseschools@gmail.com (copy to techbasengr@gmail.com). Because the form now returns visitors to this site instead of kbischools.com.ng, FormSubmit may ask for a **one-time confirmation** the first time a message arrives. Open the email from FormSubmit and click the confirmation button. Until you do, messages may not be delivered. Send a test message after merging.
+All forms (Contact, the quick admission enquiry, the admission application and the parent portal registration on the Register page) send through FormSubmit to knowledgebaseschools@gmail.com (copy to techbasengr@gmail.com). To stop the copy, delete the `_cc` line from each form. Because the form now returns visitors to this site instead of kbischools.com.ng, FormSubmit may ask for a **one-time confirmation** the first time a message arrives. Open the email from FormSubmit and click the confirmation button. Until you do, messages may not be delivered. Send a test message after merging.
 
 ## Connect a custom domain
 
