@@ -24,7 +24,8 @@ The public website of Knowledge Base International Schools (KBI Schools), a priv
 
 ## Features
 
-- Pages for About, Admission, Academics, Facilities, ICT, Alumni, News & Events and Contact
+- Pages for About, Admission, Academics, Facilities, ICT, Portal, Alumni, News & Events and Contact
+- A Portal page that sends parents and staff to the [KBIS fee portal](https://school-fee-portal-4f0e6.web.app/) and lists results, e-learning, CBT and admission links
 - Quick links to the portal login, result checker, e-learning, CBT and online application
 - Admission and contact forms with inline validation that deliver to the school's email
 - Installable on Android and iPhone, with an offline page and an in-page "update ready" prompt
