@@ -1,0 +1,16 @@
+{
+  "name": "KBI Portal",
+  "short_name": "KBI Portal",
+  "description": "Attendance, scores and report cards for Knowledge Base International Schools.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6fbfd",
+  "theme_color": "#006f90",
+  "lang": "en-NG",
+  "icons": [
+    {"src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

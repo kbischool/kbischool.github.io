@@ -23,6 +23,14 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
+      - name: Portal unit tests (scoring, attendance, student rules, screens)
+        run: npm run test:portal
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Portal security-rules tests (Firebase emulator)
+        run: npm run test:rules
       - name: Work out the site address
         id: addr
         run: |
@@ -40,6 +48,12 @@ jobs:
         env:
           SITE_ORIGIN: ${{ steps.addr.outputs.origin }}
           BASE_PATH: ${{ steps.addr.outputs.base }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
       - name: Check the build (broken links, manifest, service worker)
         run: npm run check
       - name: Lighthouse report (mobile, reports only, never blocks)

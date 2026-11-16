@@ -25,7 +25,9 @@ The public website of Knowledge Base International Schools (KBI Schools), a priv
 ## Features
 
 - Pages for About, Admission, Academics, Facilities, ICT, Portal, Alumni, News & Events and Contact
-- A Portal page that sends parents and staff to the [KBIS fee portal](https://school-fee-portal-4f0e6.web.app/) and lists results, e-learning, CBT and admission links
+- A Register page with an admission application for intending parents and a portal registration request for current parents; both go to the school email
+- The **KBI Portal** (`portal/`): attendance registers, score sheets and report cards for the owner, admins, teachers, students and parents, built on [Termbook](https://github.com/termbook/termbook.github.io) (MIT). See [portal/docs/SETUP.md](portal/docs/SETUP.md)
+- A Portal page that explains the roles, links to the KBI Portal and to Fees & Accounts (the separate school fee system), and lists results, e-learning, CBT and admission links
 - Quick links to the portal login, result checker, e-learning, CBT and online application
 - Admission and contact forms with inline validation that deliver to the school's email
 - Installable on Android and iPhone, with an offline page and an in-page "update ready" prompt
@@ -39,7 +41,7 @@ Browse the site at [kbischool.github.io](https://kbischool.github.io/). Use **Ap
 
 ## Tech stack
 
-Hand-written semantic HTML, CSS and a small amount of JavaScript. A zero-dependency Node build script assembles the pages from templates. Fonts: Sora and Inter via Fontsource (SIL Open Font License), self-hosted. Hosted on GitHub Pages and deployed by GitHub Actions. Forms use [FormSubmit](https://formsubmit.co/).
+Hand-written semantic HTML, CSS and a small amount of JavaScript. A zero-dependency Node build script assembles the pages from templates. Fonts: Sora and Inter via Fontsource (SIL Open Font License), self-hosted. Hosted on GitHub Pages and deployed by GitHub Actions. Forms (contact, enquiry, admission application, parent registration) use [FormSubmit](https://formsubmit.co/).
 
 ## Project structure
 

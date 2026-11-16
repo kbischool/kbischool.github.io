@@ -404,3 +404,7 @@ html:not(.js) .stage-node{background:var(--brand);border-color:var(--brand);colo
 @media (max-width:63.99rem){.site-header{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}}
 
 .tile-photo{width:calc(100% + var(--space-5) * 2);max-width:none;aspect-ratio:16/9;object-fit:cover;margin:calc(var(--space-5) * -1) calc(var(--space-5) * -1) var(--space-4);border-radius:var(--radius-m) var(--radius-m) 0 0}
+
+.form--grid{grid-template-columns:1fr}.field--check{grid-template-columns:auto 1fr;align-items:start;column-gap:.7rem}.field--check input{width:1.25rem;min-height:0;margin-top:.15rem}.field--check .error{grid-column:2}
+@media (min-width:40rem){.form--grid{grid-template-columns:repeat(2,1fr);column-gap:var(--space-5)}.form--grid>.field--wide,.form--grid>.btn,.form--grid>.form-note,.form--grid>.status{grid-column:1/-1}}
+.form--grid>.btn{justify-self:start}

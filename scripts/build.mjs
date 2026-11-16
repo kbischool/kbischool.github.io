@@ -194,9 +194,9 @@ const manifest = {
     { src: `${base}assets/img/maskable-512.png`, sizes: '512x512', type: 'image/png', purpose: 'maskable' }
   ],
   shortcuts: [
-    { name: 'Apply for admission', short_name: 'Apply', url: `${base}admission.html#apply`, icons: [{ src: `${base}assets/img/favicon-192.png`, sizes: '192x192', type: 'image/png' }] },
+    { name: 'Apply for admission', short_name: 'Apply', url: `${base}register.html#apply`, icons: [{ src: `${base}assets/img/favicon-192.png`, sizes: '192x192', type: 'image/png' }] },
     { name: 'News and events', short_name: 'News', url: `${base}news.html`, icons: [{ src: `${base}assets/img/favicon-192.png`, sizes: '192x192', type: 'image/png' }] },
-    { name: 'KBI Schools Portal', short_name: 'Portal', url: `${base}portal.html`, icons: [{ src: `${base}assets/img/favicon-192.png`, sizes: '192x192', type: 'image/png' }] },
+    { name: 'KBI Portal', short_name: 'Portal', url: `${base}portal/`, icons: [{ src: `${base}assets/img/favicon-192.png`, sizes: '192x192', type: 'image/png' }] },
     { name: 'Contact the school', short_name: 'Contact', url: `${base}contact.html`, icons: [{ src: `${base}assets/img/favicon-192.png`, sizes: '192x192', type: 'image/png' }] }
   ]
 };
