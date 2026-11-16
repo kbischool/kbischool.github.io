@@ -11,5 +11,6 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: { output: { manualChunks: { firebase: ["firebase/app", "firebase/auth", "firebase/firestore"], sheetjs: ["xlsx"] } } },
   },
-  test: { include: ["tests/**/*.test.js"], exclude: ["tests/rules.test.js"] },
+  // The security-rules tests need the Firestore emulator, so they only run when `npm run test:rules` starts it.
+  test: { include: ["tests/**/*.test.js"], exclude: process.env.FIRESTORE_EMULATOR_HOST ? [] : ["tests/rules.test.js"] },
 });
