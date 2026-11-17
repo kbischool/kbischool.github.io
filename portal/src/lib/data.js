@@ -38,15 +38,13 @@ export async function tryBootstrapOwner(user) {
 export async function loadSchool(id) { const s = await getDoc(ref(`schools/${id}`)); return s.exists() ? { id, ...s.data() } : null; }
 export async function getPlatform() { try { const s = await getDoc(ref("config/platform")); return s.exists() ? s.data() : { requireVerification: true }; } catch { return { requireVerification: true }; } }
 
-export async function registerAdmin({ user, admin, school, consent }) {
-  const platform = await getPlatform();
+/** KBI only: the platform owner creates the one school record. Nobody else can (see firestore.rules). */
+export async function setupKbiSchool({ user, school }) {
   const schoolRef = doc(col("schools"));
-  const status = platform.requireVerification === false ? "verified" : "pending";
   const b = writeBatch(db);
-  b.set(schoolRef, { ...school, status, adminUid: user.uid, structure: DEFAULT_STRUCTURE, scoring: DEFAULT_SCORING, settings: DEFAULT_SETTINGS, current: { session: currentSessionLabel(), term: 1 }, createdAt: serverTimestamp() });
-  b.set(ref(`users/${user.uid}`), { uid: user.uid, role: "admin", status: "active", schoolId: schoolRef.id, email: user.email, ...admin, consent, createdAt: serverTimestamp() });
+  b.set(schoolRef, { ...school, status: "verified", adminUid: user.uid, structure: DEFAULT_STRUCTURE, scoring: DEFAULT_SCORING, settings: DEFAULT_SETTINGS, current: { session: currentSessionLabel(), term: 1 }, createdAt: serverTimestamp() });
+  b.set(ref(`publicSchools/${schoolRef.id}`), { name: school.name, state: school.state, lga: school.lga, structure: DEFAULT_STRUCTURE });
   await b.commit();
-  if (status === "verified") await setDoc(ref(`publicSchools/${schoolRef.id}`), { name: school.name, state: school.state, lga: school.lga, structure: DEFAULT_STRUCTURE });
   return schoolRef.id;
 }
 export function currentSessionLabel() { const d = new Date(); const y = d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1; return `${y}/${y + 1}`; }

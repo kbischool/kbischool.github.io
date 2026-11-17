@@ -1,6 +1,6 @@
 import { h, mount, toast, empty, skeleton, confirmDialog, field, formDialog } from "../lib/dom.js";
 import { state } from "../lib/store.js";
-import { ownerSchools, ownerSetSchoolStatus, adminsOf, teachersOfSchool, findTeacherByEmail, replaceAdmin, getPlatform, setPlatform, loadAudit, nationalHolidays, saveNationalHolidays } from "../lib/data.js";
+import { setupKbiSchool, ownerSchools, ownerSetSchoolStatus, adminsOf, teachersOfSchool, findTeacherByEmail, replaceAdmin, getPlatform, setPlatform, loadAudit, nationalHolidays, saveNationalHolidays } from "../lib/data.js";
 import { input, select, friendlyAuthError } from "./common.js";
 import { showDate } from "../lib/dates.js";
 import { dateSelect } from "../lib/datepick.js";
@@ -12,6 +12,7 @@ export async function ownerSchoolsView(host, manage) {
       st === "pending" ? h("button", { class: "btn btn-sm btn-danger-quiet", onclick: async () => { await ownerSetSchoolStatus(x, "rejected"); x.status = "rejected"; draw(); } }, "Reject") : null,
       st === "verified" ? h("button", { class: "btn btn-sm btn-danger-quiet", onclick: async () => { if (await confirmDialog({ title: "Unverify this school?", body: "It disappears from the teacher registration list.", confirmLabel: "Unverify", danger: true })) { await ownerSetSchoolStatus(x, "pending"); x.status = "pending"; draw(); } } }, "Unverify") : null,
       h("button", { class: "btn btn-sm", onclick: () => replaceAdminDialog(x) }, "Replace admin"), h("button", { class: "btn btn-sm", onclick: () => manage(x) }, "Open school"))))) ] : null; };
+    if (!list.length) return mount(host, h("h1", {}, "Set up the school"), setupCard(manage));
     mount(host, h("h1", {}, "Schools"), list.length ? [g("pending", "Waiting for verification"), g("verified", "Verified"), g("rejected", "Not verified")] : empty("No schools yet", "Schools appear here when an admin registers.")); };
   draw();
 }
@@ -52,4 +53,18 @@ async function replaceAdminDialog(school) {
     h("div", { class: "field" }, h("label", { for: "ra_e" }, "Or find a teacher by email"), email, h("button", { class: "btn btn-sm", type: "button", onclick: async () => { if (!email.value.trim()) return fail("Enter an email."); const r = await findTeacherByEmail(email.value).catch(() => []); if (!r.length) return fail("No teacher account found with that email. They must register first."); pick(r[0]); } }, "Find")),
     picked, field("What happens to the current admin", old), out,
     h("div", { class: "dlg-actions sticky" }, h("button", { class: "btn", type: "button", onclick: () => close("no") }, "Cancel"), h("button", { class: "btn btn-danger", type: "submit" }, "Replace admin"))), true);
+}
+
+/** First-time setup: the owner creates the one KBI school record. Everyone else joins it. */
+function setupCard(manage) {
+  const out = h("p", { class: "form-msg", role: "alert", hidden: true });
+  const f = { name: input({ id: "kn", value: "Knowledge Base International Schools" }), address: input({ id: "ka", placeholder: "School address" }), phone: input({ id: "kp", type: "tel", placeholder: "08031234567" }), email: input({ id: "ke", type: "email", value: "knowledgebaseschools@gmail.com" }), state: input({ id: "ks", value: "Oyo" }), lga: input({ id: "kl", placeholder: "Local government" }) };
+  const go = h("button", { class: "btn btn-primary", type: "submit" }, "Create the school");
+  return h("section", { class: "card" }, h("p", { class: "muted" }, "This portal is for Knowledge Base International Schools only. Create the school record once; teachers, parents and students then join it."),
+    h("form", { novalidate: true, onsubmit: async (e) => {
+      e.preventDefault(); if (!f.name.value.trim() || !f.address.value.trim() || !f.lga.value.trim()) { out.textContent = "Fill in the school name, address and local government."; out.className = "form-msg error"; out.hidden = false; return; }
+      go.disabled = true;
+      try { const id = await setupKbiSchool({ user: state.user, school: { name: f.name.value.trim(), type: "private", state: f.state.value.trim(), lga: f.lga.value.trim(), address: f.address.value.trim(), phone: f.phone.value.replace(/[\s-]/g, ""), email: f.email.value.trim() } }); toast("School created"); manage({ id, ...(await import("../lib/data.js").then((m) => m.loadSchool(id))) }); }
+      catch (err) { out.textContent = friendlyAuthError(err); out.className = "form-msg error"; out.hidden = false; go.disabled = false; }
+    } }, field("School name", f.name), field("Address", f.address), field("State", f.state), field("Local government", f.lga), field("School phone", f.phone), field("School email", f.email), out, go));
 }

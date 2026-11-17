@@ -254,4 +254,13 @@ describe("accounts and links", () => {
     await assertSucceeds(setDoc(doc(u, "users/newstud"), { uid: "newstud", role: "student", status: "active", email: "s@x.com" }));
     await assertFails(setDoc(doc(as("bad1"), "users/bad1"), { uid: "bad1", role: "owner", status: "active" }));
   });
+
+  it("KBI only: nobody but the owner can create a school, a directory entry or an admin", async () => {
+    const u = as("newadmin");
+    await assertFails(setDoc(doc(u, "schools/s9"), { name: "Other", adminUid: "newadmin", status: "verified" }));
+    await assertFails(setDoc(doc(u, "publicSchools/s9"), { name: "Other", state: "Oyo", lga: "Ibadan" }));
+    await assertFails(setDoc(doc(u, "users/newadmin"), { uid: "newadmin", role: "admin", status: "active", schoolId: "s1" }));
+    await assertSucceeds(setDoc(doc(as("owner1"), "schools/s9"), { name: "KBI", adminUid: "owner1", status: "verified" }));
+    await assertSucceeds(setDoc(doc(as("owner1"), "users/promoted"), { uid: "promoted", role: "admin", status: "active", schoolId: "s9" }));
+  });
 });

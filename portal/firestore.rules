@@ -33,8 +33,8 @@ service cloud.firestore {
     // Minimal public directory used by the registration dropdowns. Holds no private data.
     match /publicSchools/{sid} {
       allow read: if true;
-      allow create: if isOwner() || (isAdmin(sid) && !requireVerification()
-        && request.resource.data.keys().hasOnly(['name', 'state', 'lga', 'structure', 'branding']));
+      // KBI only: nobody but the platform owner can add a school to the directory.
+      allow create: if isOwner();
       allow update: if isOwner() || (isAdmin(sid)
         && get(/databases/$(db)/documents/schools/$(sid)).data.status == 'verified'
         && request.resource.data.keys().hasOnly(['name', 'state', 'lga', 'structure', 'branding'])
@@ -50,11 +50,9 @@ service cloud.firestore {
       allow create: if isOwner()
         || (verified() && request.auth.uid == uid
             && request.resource.data.uid == uid
-            && request.resource.data.role in ['admin', 'teacher', 'parent', 'student']
-            && ((request.resource.data.role == 'admin'
-                 && request.resource.data.status == 'active'
-                 && getAfter(/databases/$(db)/documents/schools/$(request.resource.data.schoolId)).data.adminUid == uid)
-             || (request.resource.data.role == 'teacher'
+            // Admins are never self-registered: only the owner creates or promotes them.
+            && request.resource.data.role in ['teacher', 'parent', 'student']
+            && ((request.resource.data.role == 'teacher'
                  && request.resource.data.status == 'pending'
                  && request.resource.data.classKeys == []
                  && request.resource.data.assignments == []
@@ -74,9 +72,8 @@ service cloud.firestore {
 
     match /schools/{sid} {
       allow read: if isOwner() || isAdmin(sid) || isTeacher(sid);
-      allow create: if verified() && request.resource.data.adminUid == request.auth.uid
-        && ((request.resource.data.status == 'pending')
-            || (request.resource.data.status == 'verified' && !requireVerification()));
+      // KBI only: the school is created once by the platform owner.
+      allow create: if isOwner();
       allow update: if isOwner()
         || (isAdmin(sid)
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(
