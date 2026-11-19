@@ -25,7 +25,7 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Portal unit tests (scoring, attendance, student rules, screens)
         run: npm run test:portal
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
