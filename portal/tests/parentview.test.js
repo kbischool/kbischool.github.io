@@ -57,7 +57,7 @@ it("a student sees their own record read-only: no absence note form, no details 
   const { state } = await import("../src/lib/store.js"); const { parentView } = await import("../src/views/parent.js");
   Object.assign(state, { isOwner: false, profile: { role: "student", links: [{ schoolId: "s1", studentId: "k1", admissionNo: "K1" }] } });
   const host = document.createElement("div"); document.body.append(host); await parentView(host, "student"); await tick(80);
-  expect(host.textContent).toContain("My record"); expect(host.textContent).not.toContain("Link another child"); expect([...host.querySelectorAll(".tabbtn")].map((b) => b.textContent)).toEqual(["Progress", "Report cards", "Attendance"]);
+  expect(host.textContent).toContain("My record"); expect(host.textContent).not.toContain("Link another child"); expect([...host.querySelectorAll(".tabbtn")].map((b) => b.textContent)).toEqual(["Progress", "Report cards", "Attendance", "Assignments", "Lesson notes", "Notices", "Timetable"]);
   click(host, "Attendance"); await tick(80); expect(host.textContent).toContain("Attendance by week"); expect(host.textContent).not.toContain("Tell the teacher about an absence");
   click(host, "Report cards"); await tick(80); expect(host.querySelectorAll(".rc").length).toBe(2);
 });

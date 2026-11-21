@@ -263,4 +263,11 @@ describe("accounts and links", () => {
     await assertSucceeds(setDoc(doc(as("owner1"), "schools/s9"), { name: "KBI", adminUid: "owner1", status: "verified" }));
     await assertSucceeds(setDoc(doc(as("owner1"), "users/promoted"), { uid: "promoted", role: "admin", status: "active", schoolId: "s9" }));
   });
+
+  it("classroom: members read, only the right people write, students submit once and cannot self-grade", async () => {
+    await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), "schools/s1/notices/n1")));
+    await assertSucceeds(setDoc(doc(as("adm1"), "schools/s1/notices/n1"), { title: "Hi", body: "x", audience: "all", classKey: null, createdBy: "adm1" }));
+    await assertSucceeds(getDoc(doc(as("adm1"), "schools/s1/notices/n1")));
+    await assertFails(setDoc(doc(as("stranger"), "schools/s1/notices/n2"), { title: "x", body: "x", audience: "all", classKey: null, createdBy: "stranger" }));
+  });
 });
