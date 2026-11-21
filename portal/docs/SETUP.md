@@ -81,3 +81,27 @@ A Firebase password, a service-account `.json` key, or a `.env` file. The six se
 
 ## Credit
 The portal is built on [Termbook](https://github.com/termbook/termbook.github.io) (MIT licence, see `LICENSE-TERMBOOK`). Fees & Accounts is a separate system for now and is linked from the Portal page.
+
+## KBI only: how the school is created (read this after step F)
+
+This portal serves Knowledge Base International Schools only. Nobody can register another school: the rules let only the owner create the school record, and only the owner create or promote an admin.
+
+1. Sign in with the owner account. The portal shows **Set up the school**. Check the name, address and local government, then **Create the school**. This happens once.
+2. Teachers, parents and students create an account and join the school; they are never asked to pick a school.
+3. To make someone an admin: they register as a teacher, you approve them under **Teachers**, then use **Replace admin** on the school.
+4. Redeploy after changing the rules: `firebase deploy --only firestore:rules,firestore:indexes`.
+
+## Bringing in the data already in Termbook
+
+Owner menu, **Import**.
+
+1. In the Termbook Firebase console: Project settings, Your apps, Web app, copy the config block.
+2. Paste it into the Import page, then enter the Termbook school admin's email and password (use "Forgot password" in Termbook if you only ever signed in another way).
+3. Choose what to copy and press **Connect and import**. Students come first (with their private details), then attendance, terms, score sheets, conduct ratings and report cards.
+4. Open Students and Scores to check. The import keeps record ids, so running it again overwrites the same records and never duplicates them. Nothing in Termbook is changed.
+
+Parent links and accounts do not move (they belong to the Termbook project). Parents link again with the admission number and a code from Students, or tick "Parent access codes" to reuse the old codes.
+
+## Classroom features
+
+Admins and teachers see **Assignments**, **Lesson notes**, **Notices** and **Timetable**. Parents and students see them as tabs on the child's page. Everything is text and links (no file uploads), so no paid storage plan is needed. Students hand in work from their own login; the subject teacher scores it and writes feedback.
