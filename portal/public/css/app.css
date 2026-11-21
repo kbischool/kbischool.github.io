@@ -242,3 +242,16 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 .rc.dense2{gap:1.2mm}.rc.dense2 .rc-cog td{padding:.15mm 1.2mm;font-size:6.9pt}.rc.dense2 .rc-g{padding:0 1mm;font-size:6.8pt}.rc.dense2 .rc-dom li{padding:.2mm 2.4mm}.rc.dense2 .rc-box{min-height:16mm}.rc.dense2 .rc-top{padding:2mm 5mm}
 @page{size:A4;margin:8mm}
 @media print{#print-area .rc{width:194mm;min-width:0;height:281mm;min-height:0;box-shadow:none;break-after:page;page-break-after:always;break-inside:avoid;margin:0}#print-area .rc:last-child{break-after:auto;page-break-after:auto}.rc,.rc *{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* ---- Laptop and desktop: choices wrap instead of hiding off-screen, and screens use the width like the main site ---- */
+.empty h2{font-family:var(--font-display);font-weight:700;letter-spacing:-.02em}
+@media (min-width:900px){
+  .chips{flex-wrap:wrap;overflow:visible}
+  .chiprow{align-items:flex-start}.chiplabel{padding-top:.8rem}
+  .chiprow .chips{padding:2px 0}.chiprow .chips button,.chips button{min-height:40px;padding:0 var(--space-4);font-size:var(--step--1)}
+  .pickers2{gap:var(--space-3);padding:var(--space-4);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-1)}
+  .subtabs{flex-wrap:wrap}
+  .empty{padding:var(--space-7) var(--space-5);border:1px dashed var(--border-strong);border-radius:var(--radius-md);background:var(--surface)}
+  main,#view{max-width:84rem}
+}
+.chips button{font-family:var(--font-display);font-weight:600}.chips button[aria-selected=true]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
