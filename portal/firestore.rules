@@ -183,9 +183,10 @@ service cloud.firestore {
       // The class teacher (or admin) keeps it in step with the register. It holds no other student's data.
       match /studentAttendance/{docId} {
         allow read: if isClassTeacher(sid, resource.data.classKey) || linkedViewer(sid, resource.data.studentId);
-        allow create: if isClassTeacher(sid, request.resource.data.classKey)
-          && get(/databases/$(db)/documents/schools/$(sid)/students/$(request.resource.data.studentId)).data.classKey == request.resource.data.classKey;
-        allow update: if isClassTeacher(sid, resource.data.classKey) && request.resource.data.classKey == resource.data.classKey;
+        // The owner may write any record (used by the Termbook import, whose old records can predate a class change).
+        allow create: if isOwner() || (isClassTeacher(sid, request.resource.data.classKey)
+          && get(/databases/$(db)/documents/schools/$(sid)/students/$(request.resource.data.studentId)).data.classKey == request.resource.data.classKey);
+        allow update: if isOwner() || (isClassTeacher(sid, resource.data.classKey) && request.resource.data.classKey == resource.data.classKey);
         allow delete: if isOwner() || isAdmin(sid);
       }
 
