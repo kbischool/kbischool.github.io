@@ -153,6 +153,7 @@ for (const p of pages) {
   const current = (k) => (meta.nav === k ? ' aria-current="page"' : '');
   let html = layout
     .replace(/\{\{current:(\w+)\}\}/g, (a, k) => current(k))
+    .replace(/\{\{groupany:([\w,]+)\}\}/g, (a, ks) => (ks.split(',').includes(meta.nav) ? ' is-current' : ''))
     .replace(/\{\{group:(\w+)\}\}/g, (a, k) => (meta.nav === k ? ' is-current' : ''));
   html = tokens(html, {
     title: esc(meta.title), description: esc(meta.description), canonical: url,

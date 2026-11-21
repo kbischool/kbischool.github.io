@@ -86,26 +86,24 @@
     </a>
     <nav id="site-nav" class="nav" aria-label="Primary">
       <ul class="nav-list">
-        <li><a class="nav-link" href="{{base}}"{{current:home}}>Home</a></li>
+        <li class="nav-home"><a class="nav-link" href="{{base}}"{{current:home}}>Home</a></li>
         <li><details class="nav-group{{group:about}}"><summary>About</summary><div class="nav-panel">
           <a href="{{base}}about.html#about-us">About us</a><a href="{{base}}about.html#history">Our history</a><a href="{{base}}about.html#values">Our values</a><a href="{{base}}about.html#management">Management and staff</a><a href="{{base}}about.html#management-history">Management history</a><a href="{{base}}about.html#prefects">Prefects</a></div></details></li>
         <li><details class="nav-group{{group:admission}}"><summary>Admission</summary><div class="nav-panel">
           <a href="{{base}}admission.html#prospectus">Prospectus</a><a href="{{base}}admission.html#procedure">Application procedure</a><a href="{{base}}register.html#apply">Apply here</a><a href="{{base}}admission.html#faq">Common questions</a></div></details></li>
         <li><details class="nav-group{{group:academics}}"><summary>Academics</summary><div class="nav-panel">
           <a href="{{base}}academics.html#curriculum">Curriculum</a><a href="{{base}}academics.html#classes">Classes</a><a href="{{base}}academics.html#subjects">Subjects</a><a href="{{base}}academics.html#practicals">Practicals</a><a href="{{base}}academics.html#timetables">Timetables</a><a href="{{base}}academics.html#calendar">School calendar</a><a href="{{base}}academics.html#exams">External examinations</a></div></details></li>
-        <li><a class="nav-link" href="{{base}}facilities.html"{{current:facilities}}>Facilities</a></li>
-        <li><details class="nav-group{{group:ict}}"><summary>ICT</summary><div class="nav-panel">
-          <a href="{{base}}ict.html#education">ICT education</a><a href="{{base}}ict.html#portals">E-portals</a><a href="{{base}}ict.html#payments">E-payments</a><a href="{{base}}ict.html#cbt">Computer-based testing</a><a href="{{base}}ict.html#results">E-results</a></div></details></li>
-        <li><a class="nav-link" href="{{base}}portal/">Portal</a></li>
-        <li><a class="nav-link" href="{{base}}alumni.html"{{current:alumni}}>Alumni</a></li>
-        <li><a class="nav-link" href="{{base}}news.html"{{current:news}}>News &amp; events</a></li>
         <li><a class="nav-link" href="{{base}}contact.html"{{current:contact}}>Contact</a></li>
+        <li><details class="nav-group nav-more{{groupany:facilities,ict,alumni,news}}"><summary>More</summary><div class="nav-panel">
+          <a href="{{base}}facilities.html">Facilities</a><a href="{{base}}ict.html">ICT and e-portals</a><a href="{{base}}alumni.html">Alumni</a><a href="{{base}}news.html">News &amp; events</a>
+        </div></details></li>
       </ul>
-      <a class="btn btn-primary nav-cta" href="{{base}}register.html#apply">Apply now</a>
+      <div class="nav-ctas"><a class="btn btn-primary nav-cta nav-portal" href="{{base}}portal/"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>Portal</a><a class="btn btn-primary nav-cta" href="{{base}}register.html#apply">Apply now</a></div>
     </nav>
     <div class="header-actions">
       <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-contrast"/></svg></button>
-      <a class="btn btn-primary btn-sm" href="{{base}}register.html#apply">Apply now</a>
+      <a class="btn btn-primary btn-sm hdr-portal" href="{{base}}portal/"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>Portal</a>
+      <a class="btn btn-primary btn-sm hdr-apply" href="{{base}}register.html#apply">Apply now</a>
       <button class="icon-btn burger" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-nav" aria-label="Open menu"><svg class="icon icon-open" aria-hidden="true"><use href="#i-menu"/></svg><svg class="icon icon-close" aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
   </div>
