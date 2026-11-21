@@ -242,3 +242,20 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 .rc.dense2{gap:1.2mm}.rc.dense2 .rc-cog td{padding:.15mm 1.2mm;font-size:6.9pt}.rc.dense2 .rc-g{padding:0 1mm;font-size:6.8pt}.rc.dense2 .rc-dom li{padding:.2mm 2.4mm}.rc.dense2 .rc-box{min-height:16mm}.rc.dense2 .rc-top{padding:2mm 5mm}
 @page{size:A4;margin:8mm}
 @media print{#print-area .rc{width:194mm;min-width:0;height:281mm;min-height:0;box-shadow:none;break-after:page;page-break-after:always;break-inside:avoid;margin:0}#print-area .rc:last-child{break-after:auto;page-break-after:auto}.rc,.rc *{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* ---- Polish: dashboard cards, headings, page rhythm ---- */
+#view{padding-block:var(--space-5)}
+h1{font-size:var(--step-3)}
+.stats{grid-template-columns:repeat(auto-fit,minmax(11rem,1fr))}
+.stat{position:relative;overflow:hidden;min-width:0;border-radius:var(--radius-md);transition:border-color var(--dur-1),transform var(--dur-1)}
+a.stat:hover{border-color:var(--primary);transform:translateY(-2px)}
+.stat::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--gold)}
+.stat .v{font:700 var(--step-3)/1.1 var(--font-display);letter-spacing:-.03em;overflow-wrap:anywhere}
+.stat .v small{font-size:var(--step-0);font-weight:600;color:var(--text-muted)}
+.stat .l{margin-top:var(--space-1)}
+.kpi-v,.tot,.results .totc{font-weight:700}
+.row-card strong{font-family:var(--font-display);letter-spacing:-.01em}
+.card h2,.cards .card h2{font-size:var(--step-1)}
+.toolbar{align-items:center}
+.side nav a{border-radius:var(--radius-sm)}
+.shell>main{background:radial-gradient(60rem 22rem at 80% -10%,color-mix(in oklab,var(--primary) 7%,transparent),transparent 70%)}

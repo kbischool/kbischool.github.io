@@ -24,7 +24,7 @@ export async function overviewView(host) {
     mount(host, h("h1", {}, s.name),
       s.status === "pending" ? h("p", { class: "banner banner-warn" }, "Your school is waiting for verification by the platform owner. You can set up classes and students now. Teachers can find your school after it is verified.") : null,
       s.status === "rejected" ? h("p", { class: "banner banner-error" }, "Your school was not verified. Contact the platform owner.") : null,
-      h("div", { class: "stats" }, card(act, "Active students", "#/admin/students"), card(pend, "Students to confirm", "#/admin/students"), card(pending, "Teachers waiting", "#/admin/teachers"), card(`${s.current.session} · Term ${s.current.term}`, "Current term", "#/admin/setup")));
+      h("div", { class: "stats" }, card(act, "Active students", "#/admin/students"), card(pend, "Students to confirm", "#/admin/students"), card(pending, "Teachers waiting", "#/admin/teachers"), card(s.current.session, `Term ${s.current.term} · current session`, "#/admin/setup")));
   });
 }
 

@@ -1,6 +1,5 @@
 import { h, mount, toast, empty, skeleton, confirmDialog, field, formDialog } from "../lib/dom.js";
 import { state } from "../lib/store.js";
-import { connectTermbook, runImport, parseFirebaseConfig, COLLECTIONS } from "../lib/termbookImport.js";
 import { setupKbiSchool, ownerSchools, ownerSetSchoolStatus, adminsOf, teachersOfSchool, findTeacherByEmail, replaceAdmin, getPlatform, setPlatform, loadAudit, nationalHolidays, saveNationalHolidays } from "../lib/data.js";
 import { input, select, friendlyAuthError } from "./common.js";
 import { showDate } from "../lib/dates.js";
@@ -36,7 +35,7 @@ export async function ownerSettingsView(host) {
 }
 
 /** The owner hands a school to a new admin: choose a registered teacher (from this school, or found by email), and decide what happens to the old admin. */
-async function replaceAdminDialog(school) {
+export async function replaceAdminDialog(school) {
   const [admins, teachers] = await Promise.all([adminsOf(school.id).catch(() => []), teachersOfSchool(school.id).catch(() => [])]);
   let chosen = null; const out = h("p", { class: "form-msg", role: "alert", hidden: true }); const picked = h("p", { class: "banner banner-info", hidden: true });
   const fail = (t) => { out.textContent = t; out.className = "form-msg error"; out.hidden = false; };
@@ -70,27 +69,12 @@ function setupCard(manage) {
     } }, field("School name", f.name), field("Address", f.address), field("State", f.state), field("Local government", f.lga), field("School phone", f.phone), field("School email", f.email), out, go));
 }
 
-/** Owner-only: bring the school's existing Termbook data into this portal. */
-export async function importView(host) {
-  const schools = await ownerSchools(); const target = schools[0];
-  if (!target) return mount(host, h("h1", {}, "Import from Termbook"), empty("Create the school first", "Set up the KBI school under Schools, then come back to import."));
-  const out = h("p", { role: "status", hidden: true }); const say = (t, bad) => { out.hidden = false; out.className = `form-msg ${bad ? "error" : "ok"}`; out.textContent = t; };
-  const cfg = h("textarea", { id: "tbc", rows: 7, placeholder: "const firebaseConfig = {\n  apiKey: \"…\",\n  authDomain: \"…\",\n  projectId: \"…\",\n  appId: \"…\"\n};" });
-  const email = h("input", { id: "tbe", type: "email", autocomplete: "off" }), pass = h("input", { id: "tbp", type: "password", autocomplete: "off" });
-  const boxes = {}; const picks = [["settings", "School settings (classes, subjects, grading, report card text)"], ...COLLECTIONS.map(([k, l]) => [k, l])].map(([k, l]) => { boxes[k] = h("input", { type: "checkbox", checked: k !== "accessCodes" }); return h("label", { class: "chk" }, boxes[k], l); });
-  const go = h("button", { class: "btn btn-primary", type: "submit" }, "Connect and import"); const log = h("div", { class: "list" });
-  const form = h("form", { class: "card", novalidate: true, onsubmit: async (e) => {
-    e.preventDefault(); const config = parseFirebaseConfig(cfg.value); if (!config) return say("Paste the Termbook Firebase config: it must contain apiKey, projectId and appId.", true);
-    if (!email.value.trim() || !pass.value) return say("Enter the Termbook admin email and password.", true);
-    go.disabled = true; say("Signing in to Termbook…"); let conn;
-    try { conn = await connectTermbook(config, email.value.trim(), pass.value); } catch (err) { go.disabled = false; return say(`Could not sign in to Termbook: ${err.code || err.message}`, true); }
-    say(`Connected to “${conn.schoolName}”. Copying…`);
-    const res = await runImport({ conn, dstSchoolId: target.id, include: Object.fromEntries(Object.entries(boxes).map(([k, b]) => [k, b.checked])), onProgress: (p) => say(`${p.collection}: ${p.done} of ${p.total}`) });
-    conn.close(); pass.value = ""; go.disabled = false;
-    mount(log, Object.entries(res.counts).map(([k, n]) => h("div", { class: "row-card" }, h("strong", {}, k), h("span", {}, `${n} copied`))), Object.entries(res.errors).map(([k, m]) => h("div", { class: "row-card" }, h("strong", {}, k), h("span", { class: "hint" }, `Not copied: ${m}`))));
-    say(Object.keys(res.errors).length ? "Finished with some problems (below). Fix them and run the import again; it is safe to repeat." : "Import finished. Open Students and Scores to check.", !!Object.keys(res.errors).length);
-  } }, h("p", { class: "muted" }, `Copies the data already entered in Termbook into ${target.name}. Nothing in Termbook is changed, and the import can be repeated safely. Your Termbook password is used once in this browser and is not stored.`),
-    field("Termbook Firebase config", cfg, "Firebase console > Project settings > Your apps > Web app > Config."), field("Termbook admin email", email), field("Termbook admin password", pass),
-    h("h2", {}, "What to copy"), h("div", { class: "stack" }, picks), out, go);
-  mount(host, h("h1", {}, "Import from Termbook"), form, log);
+
+/** The owner's own page: the school admin, and the holidays every school can accept. Everything else the owner does from the normal menu. */
+export async function ownerPanel(host) {
+  const school = state.school; const box = h("div", {}); await ownerSettingsView(box);
+  const adminCard = h("section", { class: "card" }, h("h2", {}, "School admin"), h("p", { class: "muted" }, "The admin runs the school day to day. To hand over, choose a registered teacher as the new admin."),
+    h("button", { class: "btn btn-primary", onclick: () => replaceAdminDialog(school) }, "Replace the admin"));
+  box.querySelector("h1")?.remove(); box.querySelectorAll("section.card").forEach((c) => { if (/verification/i.test(c.textContent.slice(0, 40))) c.remove(); });
+  mount(host, h("h1", {}, "Owner"), adminCard, box);
 }
