@@ -259,3 +259,15 @@ a.stat:hover{border-color:var(--primary);transform:translateY(-2px)}
 .toolbar{align-items:center}
 .side nav a{border-radius:var(--radius-sm)}
 .shell>main{background:radial-gradient(60rem 22rem at 80% -10%,color-mix(in oklab,var(--primary) 7%,transparent),transparent 70%)}
+/* ---- Laptop and desktop: choices wrap instead of hiding off-screen, and screens use the width like the main site ---- */
+.empty h2{font-family:var(--font-display);font-weight:700;letter-spacing:-.02em}
+@media (min-width:900px){
+  .chips{flex-wrap:wrap;overflow:visible}
+  .chiprow{align-items:flex-start}.chiplabel{padding-top:.8rem}
+  .chiprow .chips{padding:2px 0}.chiprow .chips button,.chips button{min-height:40px;padding:0 var(--space-4);font-size:var(--step--1)}
+  .pickers2{gap:var(--space-3);padding:var(--space-4);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-1)}
+  .subtabs{flex-wrap:wrap}
+  .empty{padding:var(--space-7) var(--space-5);border:1px dashed var(--border-strong);border-radius:var(--radius-md);background:var(--surface)}
+  main,#view{max-width:84rem}
+}
+.chips button{font-family:var(--font-display);font-weight:600}.chips button[aria-selected=true]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
