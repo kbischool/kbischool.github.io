@@ -408,3 +408,22 @@ html:not(.js) .stage-node{background:var(--brand);border-color:var(--brand);colo
 .form--grid{grid-template-columns:1fr}.field--check{grid-template-columns:auto 1fr;align-items:start;column-gap:.7rem}.field--check input{width:1.25rem;min-height:0;margin-top:.15rem}.field--check .error{grid-column:2}
 @media (min-width:40rem){.form--grid{grid-template-columns:repeat(2,1fr);column-gap:var(--space-5)}.form--grid>.field--wide,.form--grid>.btn,.form--grid>.form-note,.form--grid>.status{grid-column:1/-1}}
 .form--grid>.btn{justify-self:start}
+
+/* ---- Compact header: logo and page first; Portal and Apply are the two gold calls to action ---- */
+.nav-ctas{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-top:var(--space-4)}.nav-ctas .nav-cta{margin-top:0}
+.header-actions .hdr-portal{display:inline-flex}.header-actions .hdr-apply{display:none}
+.header-actions .btn .icon{width:1rem;height:1rem}.nav-ctas .icon{width:1.05rem;height:1.05rem;margin-right:.4rem}
+@media (min-width:36rem){.header-actions .hdr-apply{display:inline-flex}}
+@media (min-width:64rem){
+  .nav-home{display:none}
+  .nav-ctas{display:none}
+  .header-actions .hdr-portal,.header-actions .hdr-apply{display:inline-flex}
+  .nav-more .nav-panel{left:auto;right:0}
+  .brand img{width:3rem;height:auto}.brand-name{font-size:1.2rem}
+  .brand{margin-right:var(--space-5)}
+  .nav-list{gap:.25rem}
+  .nav-link,.nav-group>summary{padding-inline:.8rem;font-size:1rem}
+}
+@media (min-width:64rem) and (max-width:79.99rem){.brand-motto{display:none}.header-actions .hdr-portal,.header-actions .hdr-apply{display:inline-flex}.nav-link,.nav-group>summary{padding-inline:.55rem;font-size:.9rem}}
+@media (min-width:80rem){.brand-motto{display:block}}
+@media (max-width:35.99rem){.brand-motto{display:none}.header-bar{gap:var(--space-2)}.header-actions{gap:.35rem}.brand img{width:2.5rem;height:auto}}
