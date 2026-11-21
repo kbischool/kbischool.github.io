@@ -1,6 +1,7 @@
 import { h, mount, toast, empty, skeleton, confirmDialog, field, formDialog } from "../lib/dom.js";
 import { state } from "../lib/store.js";
-import { ownerSchools, ownerSetSchoolStatus, adminsOf, teachersOfSchool, findTeacherByEmail, replaceAdmin, getPlatform, setPlatform, loadAudit, nationalHolidays, saveNationalHolidays } from "../lib/data.js";
+import { connectTermbook, runImport, parseFirebaseConfig, COLLECTIONS } from "../lib/termbookImport.js";
+import { setupKbiSchool, ownerSchools, ownerSetSchoolStatus, adminsOf, teachersOfSchool, findTeacherByEmail, replaceAdmin, getPlatform, setPlatform, loadAudit, nationalHolidays, saveNationalHolidays } from "../lib/data.js";
 import { input, select, friendlyAuthError } from "./common.js";
 import { showDate } from "../lib/dates.js";
 import { dateSelect } from "../lib/datepick.js";
@@ -12,6 +13,7 @@ export async function ownerSchoolsView(host, manage) {
       st === "pending" ? h("button", { class: "btn btn-sm btn-danger-quiet", onclick: async () => { await ownerSetSchoolStatus(x, "rejected"); x.status = "rejected"; draw(); } }, "Reject") : null,
       st === "verified" ? h("button", { class: "btn btn-sm btn-danger-quiet", onclick: async () => { if (await confirmDialog({ title: "Unverify this school?", body: "It disappears from the teacher registration list.", confirmLabel: "Unverify", danger: true })) { await ownerSetSchoolStatus(x, "pending"); x.status = "pending"; draw(); } } }, "Unverify") : null,
       h("button", { class: "btn btn-sm", onclick: () => replaceAdminDialog(x) }, "Replace admin"), h("button", { class: "btn btn-sm", onclick: () => manage(x) }, "Open school"))))) ] : null; };
+    if (!list.length) return mount(host, h("h1", {}, "Set up the school"), setupCard(manage));
     mount(host, h("h1", {}, "Schools"), list.length ? [g("pending", "Waiting for verification"), g("verified", "Verified"), g("rejected", "Not verified")] : empty("No schools yet", "Schools appear here when an admin registers.")); };
   draw();
 }
@@ -52,4 +54,43 @@ async function replaceAdminDialog(school) {
     h("div", { class: "field" }, h("label", { for: "ra_e" }, "Or find a teacher by email"), email, h("button", { class: "btn btn-sm", type: "button", onclick: async () => { if (!email.value.trim()) return fail("Enter an email."); const r = await findTeacherByEmail(email.value).catch(() => []); if (!r.length) return fail("No teacher account found with that email. They must register first."); pick(r[0]); } }, "Find")),
     picked, field("What happens to the current admin", old), out,
     h("div", { class: "dlg-actions sticky" }, h("button", { class: "btn", type: "button", onclick: () => close("no") }, "Cancel"), h("button", { class: "btn btn-danger", type: "submit" }, "Replace admin"))), true);
+}
+
+/** First-time setup: the owner creates the one KBI school record. Everyone else joins it. */
+function setupCard(manage) {
+  const out = h("p", { class: "form-msg", role: "alert", hidden: true });
+  const f = { name: input({ id: "kn", value: "Knowledge Base International Schools" }), address: input({ id: "ka", placeholder: "School address" }), phone: input({ id: "kp", type: "tel", placeholder: "08031234567" }), email: input({ id: "ke", type: "email", value: "knowledgebaseschools@gmail.com" }), state: input({ id: "ks", value: "Oyo" }), lga: input({ id: "kl", placeholder: "Local government" }) };
+  const go = h("button", { class: "btn btn-primary", type: "submit" }, "Create the school");
+  return h("section", { class: "card" }, h("p", { class: "muted" }, "This portal is for Knowledge Base International Schools only. Create the school record once; teachers, parents and students then join it."),
+    h("form", { novalidate: true, onsubmit: async (e) => {
+      e.preventDefault(); if (!f.name.value.trim() || !f.address.value.trim() || !f.lga.value.trim()) { out.textContent = "Fill in the school name, address and local government."; out.className = "form-msg error"; out.hidden = false; return; }
+      go.disabled = true;
+      try { const id = await setupKbiSchool({ user: state.user, school: { name: f.name.value.trim(), type: "private", state: f.state.value.trim(), lga: f.lga.value.trim(), address: f.address.value.trim(), phone: f.phone.value.replace(/[\s-]/g, ""), email: f.email.value.trim() } }); toast("School created"); manage({ id, ...(await import("../lib/data.js").then((m) => m.loadSchool(id))) }); }
+      catch (err) { out.textContent = friendlyAuthError(err); out.className = "form-msg error"; out.hidden = false; go.disabled = false; }
+    } }, field("School name", f.name), field("Address", f.address), field("State", f.state), field("Local government", f.lga), field("School phone", f.phone), field("School email", f.email), out, go));
+}
+
+/** Owner-only: bring the school's existing Termbook data into this portal. */
+export async function importView(host) {
+  const schools = await ownerSchools(); const target = schools[0];
+  if (!target) return mount(host, h("h1", {}, "Import from Termbook"), empty("Create the school first", "Set up the KBI school under Schools, then come back to import."));
+  const out = h("p", { role: "status", hidden: true }); const say = (t, bad) => { out.hidden = false; out.className = `form-msg ${bad ? "error" : "ok"}`; out.textContent = t; };
+  const cfg = h("textarea", { id: "tbc", rows: 7, placeholder: "const firebaseConfig = {\n  apiKey: \"…\",\n  authDomain: \"…\",\n  projectId: \"…\",\n  appId: \"…\"\n};" });
+  const email = h("input", { id: "tbe", type: "email", autocomplete: "off" }), pass = h("input", { id: "tbp", type: "password", autocomplete: "off" });
+  const boxes = {}; const picks = [["settings", "School settings (classes, subjects, grading, report card text)"], ...COLLECTIONS.map(([k, l]) => [k, l])].map(([k, l]) => { boxes[k] = h("input", { type: "checkbox", checked: k !== "accessCodes" }); return h("label", { class: "chk" }, boxes[k], l); });
+  const go = h("button", { class: "btn btn-primary", type: "submit" }, "Connect and import"); const log = h("div", { class: "list" });
+  const form = h("form", { class: "card", novalidate: true, onsubmit: async (e) => {
+    e.preventDefault(); const config = parseFirebaseConfig(cfg.value); if (!config) return say("Paste the Termbook Firebase config: it must contain apiKey, projectId and appId.", true);
+    if (!email.value.trim() || !pass.value) return say("Enter the Termbook admin email and password.", true);
+    go.disabled = true; say("Signing in to Termbook…"); let conn;
+    try { conn = await connectTermbook(config, email.value.trim(), pass.value); } catch (err) { go.disabled = false; return say(`Could not sign in to Termbook: ${err.code || err.message}`, true); }
+    say(`Connected to “${conn.schoolName}”. Copying…`);
+    const res = await runImport({ conn, dstSchoolId: target.id, include: Object.fromEntries(Object.entries(boxes).map(([k, b]) => [k, b.checked])), onProgress: (p) => say(`${p.collection}: ${p.done} of ${p.total}`) });
+    conn.close(); pass.value = ""; go.disabled = false;
+    mount(log, Object.entries(res.counts).map(([k, n]) => h("div", { class: "row-card" }, h("strong", {}, k), h("span", {}, `${n} copied`))), Object.entries(res.errors).map(([k, m]) => h("div", { class: "row-card" }, h("strong", {}, k), h("span", { class: "hint" }, `Not copied: ${m}`))));
+    say(Object.keys(res.errors).length ? "Finished with some problems (below). Fix them and run the import again; it is safe to repeat." : "Import finished. Open Students and Scores to check.", !!Object.keys(res.errors).length);
+  } }, h("p", { class: "muted" }, `Copies the data already entered in Termbook into ${target.name}. Nothing in Termbook is changed, and the import can be repeated safely. Your Termbook password is used once in this browser and is not stored.`),
+    field("Termbook Firebase config", cfg, "Firebase console > Project settings > Your apps > Web app > Config."), field("Termbook admin email", email), field("Termbook admin password", pass),
+    h("h2", {}, "What to copy"), h("div", { class: "stack" }, picks), out, go);
+  mount(host, h("h1", {}, "Import from Termbook"), form, log);
 }

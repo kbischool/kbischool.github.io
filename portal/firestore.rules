@@ -23,6 +23,9 @@ service cloud.firestore {
     function linkedParent(sid, studentId) { return verified() && hasProfile() && meDoc().role == 'parent' && exists(/databases/$(db)/documents/schools/$(sid)/links/$(request.auth.uid + '_' + studentId)); }
     // A student signs in with their own account and links to their own record with the same admission number and access code. Students only read.
     function linkedViewer(sid, studentId) { return verified() && hasProfile() && meDoc().role in ['parent', 'student'] && exists(/databases/$(db)/documents/schools/$(sid)/links/$(request.auth.uid + '_' + studentId)); }
+    // Anyone signed in with a profile can read school notices, lesson notes, assignments and timetables (none of it is personal data). Submissions are private (below).
+    function member() { return verified() && hasProfile() && meDoc().role in ['owner', 'admin', 'teacher', 'parent', 'student'] && meDoc().status == 'active'; }
+    function isStudentOf(sid, studentId) { return verified() && hasProfile() && meDoc().role == 'student' && exists(/databases/$(db)/documents/schools/$(sid)/links/$(request.auth.uid + '_' + studentId)); }
     function termPublished(sid, termId) { return get(/databases/$(db)/documents/schools/$(sid)/terms/$(termId)).data.published == true; }
 
     match /config/{doc} {
@@ -33,8 +36,8 @@ service cloud.firestore {
     // Minimal public directory used by the registration dropdowns. Holds no private data.
     match /publicSchools/{sid} {
       allow read: if true;
-      allow create: if isOwner() || (isAdmin(sid) && !requireVerification()
-        && request.resource.data.keys().hasOnly(['name', 'state', 'lga', 'structure', 'branding']));
+      // KBI only: nobody but the platform owner can add a school to the directory.
+      allow create: if isOwner();
       allow update: if isOwner() || (isAdmin(sid)
         && get(/databases/$(db)/documents/schools/$(sid)).data.status == 'verified'
         && request.resource.data.keys().hasOnly(['name', 'state', 'lga', 'structure', 'branding'])
@@ -50,11 +53,9 @@ service cloud.firestore {
       allow create: if isOwner()
         || (verified() && request.auth.uid == uid
             && request.resource.data.uid == uid
-            && request.resource.data.role in ['admin', 'teacher', 'parent', 'student']
-            && ((request.resource.data.role == 'admin'
-                 && request.resource.data.status == 'active'
-                 && getAfter(/databases/$(db)/documents/schools/$(request.resource.data.schoolId)).data.adminUid == uid)
-             || (request.resource.data.role == 'teacher'
+            // Admins are never self-registered: only the owner creates or promotes them.
+            && request.resource.data.role in ['teacher', 'parent', 'student']
+            && ((request.resource.data.role == 'teacher'
                  && request.resource.data.status == 'pending'
                  && request.resource.data.classKeys == []
                  && request.resource.data.assignments == []
@@ -74,9 +75,8 @@ service cloud.firestore {
 
     match /schools/{sid} {
       allow read: if isOwner() || isAdmin(sid) || isTeacher(sid);
-      allow create: if verified() && request.resource.data.adminUid == request.auth.uid
-        && ((request.resource.data.status == 'pending')
-            || (request.resource.data.status == 'verified' && !requireVerification()));
+      // KBI only: the school is created once by the platform owner.
+      allow create: if isOwner();
       allow update: if isOwner()
         || (isAdmin(sid)
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(
@@ -200,6 +200,46 @@ service cloud.firestore {
         allow update: if verified() && resource.data.uid == request.auth.uid && linkedParent(sid, resource.data.studentId)
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reason', 'createdAt']);
         allow delete: if isOwner() || isAdmin(sid) || (verified() && resource.data.uid == request.auth.uid);
+      }
+
+      // ---- Classroom: notices, lesson notes, assignments, submissions and timetables ----
+      match /notices/{id} {
+        allow read: if member();
+        allow create: if (isOwner() || isAdmin(sid)
+            || (isTeacher(sid) && request.resource.data.classKey != null && request.resource.data.classKey in meDoc().classKeys))
+          && request.resource.data.createdBy == request.auth.uid;
+        allow update, delete: if isOwner() || isAdmin(sid) || (isTeacher(sid) && resource.data.createdBy == request.auth.uid);
+      }
+      match /notes/{id} {
+        allow read: if member();
+        allow create: if teachesSubject(sid, request.resource.data.subject, request.resource.data.classKey) && request.resource.data.createdBy == request.auth.uid;
+        allow update, delete: if teachesSubject(sid, resource.data.subject, resource.data.classKey);
+      }
+      match /assignments/{id} {
+        allow read: if member();
+        allow create: if teachesSubject(sid, request.resource.data.subject, request.resource.data.classKey) && request.resource.data.createdBy == request.auth.uid;
+        allow update, delete: if teachesSubject(sid, resource.data.subject, resource.data.classKey);
+      }
+      // One submission per student and assignment. The student writes the answer; the subject teacher writes the score and feedback.
+      match /submissions/{id} {
+        allow read: if teachesSubject(sid, resource.data.subject, resource.data.classKey) || isClassTeacher(sid, resource.data.classKey)
+          || linkedViewer(sid, resource.data.studentId);
+        allow create: if isStudentOf(sid, request.resource.data.studentId)
+          && id == request.resource.data.assignmentId + '_' + request.resource.data.studentId
+          && request.resource.data.uid == request.auth.uid
+          && get(/databases/$(db)/documents/schools/$(sid)/students/$(request.resource.data.studentId)).data.classKey == request.resource.data.classKey
+          && get(/databases/$(db)/documents/schools/$(sid)/assignments/$(request.resource.data.assignmentId)).data.classKey == request.resource.data.classKey
+          && request.resource.data.keys().hasOnly(['assignmentId', 'studentId', 'classKey', 'subject', 'text', 'link', 'uid', 'submittedAt']);
+        allow update: if (isStudentOf(sid, resource.data.studentId) && !('gradedAt' in resource.data)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'link', 'submittedAt']))
+          || (teachesSubject(sid, resource.data.subject, resource.data.classKey)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['score', 'feedback', 'gradedAt', 'gradedBy']));
+        allow delete: if isOwner() || isAdmin(sid);
+      }
+      // One timetable per class, written by the admin.
+      match /timetables/{id} {
+        allow read: if member();
+        allow write: if isOwner() || isAdmin(sid);
       }
 
       // Compiled report cards. Parents read their own child's report only after the term is published.

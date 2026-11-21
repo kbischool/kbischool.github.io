@@ -2,7 +2,7 @@ import { h, field, mount, toast } from "../lib/dom.js";
 import { auth } from "../lib/firebase.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendEmailVerification, sendPasswordResetEmail, signOut } from "firebase/auth";
 import { input, select, msg, busy, friendlyAuthError, loadNg, rolePicker } from "./common.js";
-import { registerAdmin, registerTeacher, registerParent, registerStudent, publicSchools, DEFAULT_STRUCTURE } from "../lib/data.js";
+import { registerTeacher, registerParent, registerStudent, publicSchools, DEFAULT_STRUCTURE } from "../lib/data.js";
 import { validPhone } from "../lib/dates.js";
 import { dateSelect } from "../lib/datepick.js";
 import { APP_NAME, SINGLE_SCHOOL, SCHOOL_NAME } from "../lib/config.js";
@@ -32,10 +32,16 @@ export function authView(kind) {
     msg(out, ""); try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (err) { msg(out, friendlyAuthError(err)); }
   } }, "Continue with Google");
   return card(h("h1", {}, isLogin ? "Log in" : "Create your account"),
-    !isLogin ? h("p", { class: "muted" }, "First create an account. Next you choose whether you are a school admin, a teacher or a parent.") : null,
+    h("p", { class: "muted" }, isLogin ? `Sign in to the ${SCHOOL_NAME} portal.` : "Create an account with your email. Next you choose whether you are a parent, a student or a teacher."),
     form, h("div", { class: "or" }, "or"), google,
-    h("p", { class: "links" }, isLogin ? [h("a", { href: "#/forgot" }, "Forgot password?"), " · ", h("a", { href: "#/register" }, "Create an account")] : [h("a", { href: "#/login" }, "I already have an account")]));
+    h("p", { class: "links" }, isLogin ? [h("a", { href: "#/forgot" }, "Forgot password?"), " · ", h("a", { href: "#/register" }, "Create an account")] : [h("a", { href: "#/login" }, "I already have an account")]),
+    isLogin ? servicesBlock() : null);
 }
+
+/** Other KBI services, one tap from the sign-in page. */
+const SERVICES = [["Fees & Accounts", "Pay and track school fees", "https://school-fee-portal-4f0e6.web.app/"], ["E-learning", "Lessons and class resources", "https://kbischools.com.ng/lms"], ["CBT", "Computer-based tests", "https://kbischools.com.ng/signin/#/"]];
+const servicesBlock = () => h("div", { class: "services" }, h("h2", {}, "Other KBI services"),
+  SERVICES.map(([t, d, u]) => h("a", { href: u, target: "_blank", rel: "noopener noreferrer" }, t, h("span", {}, d))), h("a", { href: "../" }, "KBI Schools website", h("span", {}, "Back to the main site")));
 
 export function forgotView() {
   const email = input({ id: "fe", type: "email", autocomplete: "email" }); const out = h("p", { role: "status", hidden: true });
@@ -65,14 +71,11 @@ export function waitingView(kind, user) {
 
 /** After verification, before a profile exists: choose a role and complete it. */
 export function onboardingView(user, onDone) {
-  const host = h("div", {}); let noSchool = !SINGLE_SCHOOL;
-  if (SINGLE_SCHOOL) publicSchools().then((l) => { noSchool = l.length === 0; if (noSchool) pick(); }).catch(() => {});
-  const pick = () => mount(host, card(h("h1", {}, "Who are you?"),
+  const host = h("div", {});   const pick = () => mount(host, card(h("h1", {}, "Who are you?"),
     h("div", { class: "stack" },
       h("button", { class: "btn btn-primary", type: "button", onclick: () => parentForm("parent") }, "I am a parent"),
       h("button", { class: "btn btn-primary", type: "button", onclick: () => parentForm("student") }, "I am a student"),
-      h("button", { class: "btn", type: "button", onclick: () => teacherForm() }, SINGLE_SCHOOL ? `I am a teacher at ${SCHOOL_NAME}` : "I am a teacher joining my school"),
-      noSchool ? h("button", { class: "btn", type: "button", onclick: () => adminForm() }, "I am registering the school (first-time setup)") : null,
+      h("button", { class: "btn", type: "button", onclick: () => teacherForm() }, `I am a teacher at ${SCHOOL_NAME}`),
       h("button", { class: "btn btn-quiet", type: "button", onclick: () => signOut(auth) }, "Log out"))));
   const personal = (nameHint = "Surname first, e.g. ADEBAYO Temitope") => {
     const name = input({ id: "pn", placeholder: nameHint, autocomplete: "name" }); const phone = input({ id: "pp", type: "tel", placeholder: "08031234567 or +2348031234567", autocomplete: "tel" }); const dob = dateSelect({ id: "pd", label: "Date of birth", from: new Date().getFullYear() - 80, to: new Date().getFullYear() - 16 });
@@ -88,44 +91,20 @@ export function onboardingView(user, onDone) {
   const consent = () => ({ version: CONSENT_VERSION, at: new Date().toISOString() });
   const back = h("button", { class: "btn btn-quiet", type: "button", onclick: pick }, "Back");
 
-  async function adminForm() {
-    const ng = await loadNg(); const out = h("p", { role: "alert", hidden: true });
-    const sn = input({ id: "sn", placeholder: "School name" }); const st = select(["", ...ng.map((s) => s.name)], "", { id: "ss" }); const lga = select([""], "", { id: "sl" });
-    st.addEventListener("change", () => { const l = ng.find((s) => s.name === st.value)?.lgas || []; lga.replaceChildren(...["", ...l].map((x) => h("option", { value: x }, x || "Choose local government"))); });
-    st.firstChild.textContent = "Choose state";
-    const ty = select([["", "Choose type"], ["public", "Public"], ["private", "Private"], ["mission", "Mission"]], ""); const addr = input({ id: "sa" }); const sp = input({ id: "sph", type: "tel" }); const se = input({ id: "se", type: "email" });
-    const p = personal(); const go = h("button", { class: "btn btn-primary", type: "submit" }, "Register school");
-    mount(host, card(h("h1", {}, "Register your school"), h("form", { novalidate: true, onsubmit: async (e) => {
-      e.preventDefault(); msg(out, "");
-      if (!sn.value.trim() || !st.value || !lga.value || !ty.value || !addr.value.trim()) return msg(out, "Fill in the school name, type, state, local government and address.");
-      if (!validPhone(sp.value)) return msg(out, "Enter a valid school phone number.");
-      if (!/^\S+@\S+\.\S+$/.test(se.value)) return msg(out, "Enter a valid school email.");
-      const a = checkPersonal(p, out); if (!a) return;
-      busy(go, true, "Register school");
-      try { await registerAdmin({ user, admin: a, school: { name: sn.value.trim(), type: ty.value, state: st.value, lga: lga.value, address: addr.value.trim(), phone: sp.value.replace(/[\s-]/g, ""), email: se.value.trim() }, consent: consent() }); onDone(); }
-      catch (err) { msg(out, friendlyAuthError(err)); busy(go, false, "Register school"); }
-    } }, h("h2", {}, "School"), field("School name", sn), field("Type", ty), field("State", st), field("Local government", lga), field("Address", addr), field("School phone", sp), field("School email", se),
-      h("h2", {}, "Your details"), p.el, consentBox(), out, h("div", { class: "stack" }, go, back))));
-  }
-
   async function teacherForm() {
-    const ng = await loadNg(); const schools = await publicSchools().catch(() => []); const out = h("p", { role: "alert", hidden: true });
-    const st = select([["", "Choose state"], ...ng.map((s) => s.name)], ""); const lga = select([["", "Choose local government"]], ""); const sch = select([["", "Choose school"]], "");
-    const roleHost = h("div", {}); let picker = null; let chosen = null;
-    if (SINGLE_SCHOOL && schools.length) { chosen = schools[0]; picker = rolePicker(chosen.structure || DEFAULT_STRUCTURE); roleHost.replaceChildren(picker.el); }
-    st.addEventListener("change", () => { lga.replaceChildren(...[["", "Choose local government"], ...(ng.find((s) => s.name === st.value)?.lgas || [])].map((x) => { const [v, l] = Array.isArray(x) ? x : [x, x]; return h("option", { value: v }, l); })); sch.replaceChildren(h("option", { value: "" }, "Choose school")); roleHost.replaceChildren(); });
-    lga.addEventListener("change", () => { const l = schools.filter((s) => s.state === st.value && s.lga === lga.value).sort((a, b) => a.name.localeCompare(b.name)); sch.replaceChildren(...[h("option", { value: "" }, l.length ? "Choose school" : "No verified schools here yet"), ...l.map((s) => h("option", { value: s.id }, s.name))]); });
-    sch.addEventListener("change", () => { chosen = schools.find((s) => s.id === sch.value); picker = chosen ? rolePicker(chosen.structure || DEFAULT_STRUCTURE) : null; roleHost.replaceChildren(...(picker ? [picker.el] : [])); });
+    const schools = await publicSchools().catch(() => []); const out = h("p", { role: "alert", hidden: true });
+    const chosen = schools[0];
+    if (!chosen) return mount(host, card(h("h1", {}, "Not ready yet"), h("p", { class: "muted" }, `${SCHOOL_NAME} has not been set up on the portal yet. Please try again later or contact the school office.`), back));
+    const picker = rolePicker(chosen.structure || DEFAULT_STRUCTURE);
     const p = personal(); const go = h("button", { class: "btn btn-primary", type: "submit" }, "Send request");
-    mount(host, card(h("h1", {}, "Join your school"), h("form", { novalidate: true, onsubmit: async (e) => {
+    mount(host, card(h("h1", {}, "Join as a teacher"), h("form", { novalidate: true, onsubmit: async (e) => {
       e.preventDefault(); msg(out, "");
-      if (!chosen) return msg(out, "Choose your state, local government and school.");
       const r = picker.get(); if (!r.classTeacher && !r.assignments.length) return msg(out, "Choose a class you are class teacher for, or subjects and classes you teach.");
       const a = checkPersonal(p, out); if (!a) return;
       busy(go, true, "Send request");
       try { await registerTeacher({ user, teacher: a, schoolId: chosen.id, requested: { classTeacher: r.classTeacher, assignments: r.assignments }, consent: consent() }); onDone(); }
       catch (err) { msg(out, friendlyAuthError(err)); busy(go, false, "Send request"); }
-    } }, h("h2", {}, "Your school"), SINGLE_SCHOOL && chosen ? h("p", {}, h("strong", {}, chosen.name)) : [field("State", st), field("Local government", lga), field("School", sch)], h("h2", {}, "Your roles"), roleHost, h("h2", {}, "Your details"), p.el, consentBox(), out, h("div", { class: "stack" }, go, back))));
+    } }, h("p", { class: "muted" }, `Your request goes to the school admin at ${SCHOOL_NAME}. You see school data once they approve you.`), h("h2", {}, "Your roles"), picker.el, h("h2", {}, "Your details"), p.el, consentBox(), out, h("div", { class: "stack" }, go, back))));
   }
 
   function parentForm(role = "parent") {

@@ -9,48 +9,69 @@ const td = (content, o = {}) => h("td", { class: o.cls || null, colspan: o.span 
 const th = (content, o = {}) => h("th", { class: o.cls || null, colspan: o.span || null, rowspan: o.rows || null }, content);
 const nz = (v) => (v === 0 || v === "" || v === undefined ? "0" : String(v));
 
-/** The student report card, laid out like the Oyo State school report card. Everything printed comes from the card object. */
+/**
+ * The student report card: one A4 page per student, in the Oyo State report card format (same fields, same grading and rating keys),
+ * set out in the KBI house style. Everything printed comes from the card object.
+ */
 export function renderReportCard(card, { logo = "", stateLogo = "" } = {}) {
-  const st = card.student, c = card.counts, a = card.attendance, final = card.final;
+  const st = card.student, c = card.counts, a = card.attendance, final = card.final, tot = card.totals;
+  const schoolLogo = logo || `${import.meta.env.BASE_URL}assets/icons/logo.webp`;
   const img = (src, alt, cls) => (src ? h("img", { src, alt, class: cls || null }) : null);
-  const head = h("table", { class: "rc-t rc-head" },
-    h("tr", {}, td(img(stateLogo, "State crest", "rc-logo"), { rows: 3, cls: "rc-logocell" }), td(card.header.heading, { cls: "rc-title" }), td(img(logo, "School logo", "rc-logo"), { rows: 3, cls: "rc-logocell" })),
-    h("tr", {}, td(card.header.subheading, { cls: "rc-sub" })),
-    h("tr", {}, td(h("table", { class: "rc-t rc-inner" }, h("tr", {}, td("STUDENT REPORT CARD", { cls: "rc-gold rc-ul rc-b" }), td("Age:", { cls: "rc-lab" }), td(st.age === "" ? "" : String(st.age), { cls: "rc-val" }), td("Class Category:", { cls: "rc-lab" }), td(st.classCategory, { cls: "rc-val" }))), { cls: "rc-strip" })));
-  const lab = (t, span) => td(t, { cls: "rc-lab", span }); const val = (t, span) => td(t, { cls: "rc-val", span });
-  const info = h("table", { class: "rc-t rc-g24" },
-    h("tr", {}, val(String(st.sn), 2), lab("Student Name:", 4), td(st.name, { cls: "rc-val rc-big", span: 6 }), lab("Gender", 2), val(st.gender, 2), lab("Adm. No.", 2), val(st.admissionNo, 2), lab("Class:", 2), val(st.className, 2)),
-    h("tr", {}, lab("Number of Subjects Offered:", 4), val(String(c.offered), 2), lab("Number Passed:", 3), val(String(c.passed), 2), lab("Number Failed:", 3), val(String(c.failed), 2), lab("Number of Students in Class:", 3), val(String(c.classSize), 2), lab("Class Position", 2), val(c.position ? ordinalOf(c.position) : "", 1)),
-    h("tr", {}, lab("No of Times School Opened:", 4), val(String(a.opened), 2), lab("No of Times Present:", 3), val(String(a.present), 2), lab("No of Times Absent:", 3), val(String(a.absent), 2), lab("Academic Session:", 3), val(card.session, 2), lab("Term:", 2), val(card.termName, 1)));
-  const bar = (t) => h("div", { class: "rc-bar" }, t);
   const T = card.termName.charAt(0) + card.termName.slice(1).toLowerCase();
   const tn = { 1: "1st", 2: "2nd", 3: "3rd" }[card.term];
+  const kv = (k, v, cls) => h("div", { class: `rc-kv${cls ? ` ${cls}` : ""}` }, h("span", {}, k), h("b", {}, v === undefined || v === "" ? "—" : String(v)));
+  const tile = (k, v, sub, cls) => h("div", { class: `rc-tile${cls ? ` ${cls}` : ""}` }, h("span", {}, k), h("b", {}, v), sub ? h("small", {}, sub) : null);
+
+  const top = h("header", { class: "rc-top" },
+    img(stateLogo, "State crest", "rc-logo") || h("span", { class: "rc-logo-gap" }),
+    h("div", { class: "rc-ident" }, h("div", { class: "rc-gov" }, card.header.heading), h("div", { class: "rc-school" }, card.header.subheading)),
+    img(schoolLogo, "School logo", "rc-logo"));
+  const title = h("div", { class: "rc-title" }, h("b", {}, "STUDENT REPORT CARD"), h("span", {}, `${T} Term · ${card.session} Academic Session`));
+
+  const who = h("section", { class: "rc-who" },
+    h("div", { class: "rc-name" }, h("small", {}, `No. ${st.sn} · Student name`), h("b", {}, st.name),
+      h("div", { class: "rc-meta" }, kv("Adm. No.", st.admissionNo), kv("Class", st.className), kv("Gender", st.gender), kv("Age", st.age), st.classCategory ? kv("Category", st.classCategory) : null)),
+    h("div", { class: "rc-tiles" },
+      tile("Position in class", c.position ? ordinalOf(c.position) : "—", c.position ? `out of ${c.classSize} students` : `${c.classSize} students in class`, "gold"),
+      tile("Overall average", `${tot.percent}%`, tot.classPercent ? `class average ${tot.classPercent}%` : ""),
+      tile("Subjects passed", `${c.passed}/${c.offered}`, `${c.failed} failed`)));
+  const att = h("div", { class: "rc-att" }, kv("Subjects offered", c.offered), kv("Number passed", c.passed), kv("Number failed", c.failed), kv("Students in class", c.classSize),
+    kv("Times school opened", a.opened), kv("Times present", a.present), kv("Times absent", a.absent));
+
+  const bar = (t) => h("div", { class: "rc-bar" }, t);
+  const gk = card.gradeKey.map((g) => g.g); const tone = (g) => (g === "NA" ? "na" : g === gk[0] ? "top" : g === gk[gk.length - 1] ? "fail" : "mid");
+  const nz = (v) => (v === 0 || v === "" || v === undefined ? "0" : String(v));
+  const sub = (pct) => h("small", { class: "rc-pct" }, `${pct}%`);
   const rowsEl = card.rows.map((r) => h("tr", { class: r.offered ? "" : "na" },
-    td(String(r.sn), { cls: "rc-c" }), td(r.subject), td(r.offered ? "100" : "--", { cls: "rc-c" }),
-    final ? [td(nz(r.ca), { cls: "rc-c" }), td(nz(r.exam), { cls: "rc-c" }), td(nz(r.total), { cls: "rc-c" }), td(nz(r.t2), { cls: "rc-c" }), td(nz(r.t1), { cls: "rc-c" }), td(nz(r.avg), { cls: "rc-c rc-b" })] : [td(nz(r.ca), { cls: "rc-c" }), td(nz(r.exam), { cls: "rc-c" }), td(nz(r.total), { cls: "rc-c" })],
-    td(r.grade, { cls: "rc-c" }), td(r.remark, { cls: "rc-c rc-sm" })));
-  const sub = (pct) => h("div", { class: "rc-pct" }, `${pct}%`);
+    td(String(r.sn), { cls: "rc-c rc-faint" }), td(r.subject, { cls: "rc-subj" }), td(r.offered ? "100" : "--", { cls: "rc-c" }),
+    final ? [td(nz(r.ca), { cls: "rc-c" }), td(nz(r.exam), { cls: "rc-c" }), td(nz(r.total), { cls: "rc-c" }), td(nz(r.t2), { cls: "rc-c" }), td(nz(r.t1), { cls: "rc-c" }), td(nz(r.avg), { cls: "rc-c rc-b" })]
+      : [td(nz(r.ca), { cls: "rc-c" }), td(nz(r.exam), { cls: "rc-c" }), td(nz(r.total), { cls: "rc-c rc-b" }), td(r.offered ? nz(r.classAvg) : "--", { cls: "rc-c rc-faint" })],
+    td(h("span", { class: `rc-g rc-g-${tone(r.grade)}` }, r.grade), { cls: "rc-c" }), td(r.remark, { cls: "rc-c rc-sm" })));
   const headRow = final
-    ? h("tr", { class: "rc-th" }, th("S/NO"), th("Subject"), th("Marks Obtain-able"), th(["3rd Term C.A.", sub(card.pct.ca)]), th(["3rd Term Exam", sub(card.pct.exam)]), th(["3rd Term Total", sub(100)]), th("2nd Term Total (100%)"), th("1st Term Total (100%)"), th("Average Score in %"), th("Grade Obtained"), th("Remarks"))
-    : h("tr", { class: "rc-th" }, th("S/NO"), th("Subject"), th("Marks Obtain-able"), th([`${tn} Term Continuous Assessment (C.A.)`, sub(card.pct.ca)]), th([`${tn} Term Examination`, sub(card.pct.exam)]), th([`${tn} Term Total Score`, sub(100)]), th("Grade Obtained"), th("Remarks"));
-  const tot = card.totals;
+    ? h("tr", {}, th("S/NO"), th("Subject"), th("Marks Obtain-able"), th(["3rd Term C.A.", sub(card.pct.ca)]), th(["3rd Term Exam", sub(card.pct.exam)]), th(["3rd Term Total", sub(100)]), th("2nd Term Total (100%)"), th("1st Term Total (100%)"), th("Average Score in %"), th("Grade Obtained"), th("Remarks"))
+    : h("tr", {}, th("S/NO"), th("Subject"), th("Marks Obtain-able"), th([`${tn} Term Continuous Assessment (C.A.)`, sub(card.pct.ca)]), th([`${tn} Term Examination`, sub(card.pct.exam)]), th([`${tn} Term Total Score`, sub(100)]), th("Class Average"), th("Grade Obtained"), th("Remarks"));
   const totalRow = final
-    ? h("tr", { class: "rc-tot" }, td("TOTAL MARKS OBTAINABLE:", { cls: "rc-lab", span: 2 }), td(String(tot.obtainable), { cls: "rc-c rc-b" }), td("", { span: 4 }), td("TOTAL MARKS OBTAINED:", { cls: "rc-lab rc-sm" }), td(String(tot.obtained), { cls: "rc-c rc-b" }), td("%", { cls: "rc-c rc-b" }), td(String(tot.percent), { cls: "rc-c rc-b" }))
-    : h("tr", { class: "rc-tot" }, td("TOTAL MARKS OBTAINABLE:", { cls: "rc-lab", span: 2 }), td(String(tot.obtainable), { cls: "rc-c rc-b" }), td(""), td("TOTAL MARKS OBTAINED:", { cls: "rc-lab rc-sm" }), td(String(tot.obtained), { cls: "rc-c rc-b" }), td("%", { cls: "rc-c rc-b" }), td(String(tot.percent), { cls: "rc-c rc-b" }));
-  const cog = h("table", { class: `rc-t rc-cog${final ? " rc-final" : ""}` }, h("thead", {}, headRow), h("tbody", {}, rowsEl), h("tfoot", {}, totalRow));
-  const key = h("div", { class: "rc-key" }, h("b", {}, "GRADE INTERPRETATION ::: "), card.gradeKey.map((g) => h("span", { class: "rc-green" }, `${g.g}: ${String(g.label).toUpperCase()}`)));
-  const domain = (title, d, n) => [bar(title), h("table", { class: `rc-t rc-dom n${n}` },
-    h("tr", {}, d.items.map((i) => th(i.label.toUpperCase(), { cls: "rc-trait" })), td("TOTAL SCORE", { cls: "rc-b rc-c" }), td(String(d.total || ""), { cls: "rc-b rc-c rc-big" })),
-    h("tr", {}, d.items.map((i) => td(i.text || "--", { cls: "rc-c rc-faint" })), td("SCORE OBTAINED", { cls: "rc-b rc-c", rows: 2 }), td(String(d.obtained || ""), { cls: "rc-b rc-c rc-big", rows: 2 })),
-    h("tr", {}, d.items.map((i) => td(i.rating ? String(i.rating) : "--", { cls: "rc-c rc-faint" }))))];
-  const ratingKey = h("div", { class: "rc-key" }, h("b", {}, "NON-COGNITIVE ASPECTS RATING KEYS: "), [5, 4, 3, 2, 1].map((n) => h("span", { class: "rc-green" }, `${n}-${RATING_NAME[n]}`)));
+    ? h("tr", {}, td("TOTAL MARKS OBTAINABLE:", { cls: "rc-lab", span: 2 }), td(String(tot.obtainable), { cls: "rc-c rc-b" }), td("TOTAL MARKS OBTAINED:", { cls: "rc-lab", span: 3 }), td(String(tot.obtained), { cls: "rc-c rc-b" }), td("%", { cls: "rc-c rc-b" }), td(String(tot.percent), { cls: "rc-c rc-b rc-hi", span: 3 }))
+    : h("tr", {}, td("TOTAL MARKS OBTAINABLE:", { cls: "rc-lab", span: 2 }), td(String(tot.obtainable), { cls: "rc-c rc-b" }), td("TOTAL MARKS OBTAINED:", { cls: "rc-lab", span: 2 }), td(String(tot.obtained), { cls: "rc-c rc-b" }), td("%", { cls: "rc-c rc-b" }), td(String(tot.percent), { cls: "rc-c rc-b rc-hi", span: 2 }));
+  const cog = h("table", { class: `rc-cog${final ? " rc-final" : ""}` }, h("thead", {}, headRow), h("tbody", {}, rowsEl), h("tfoot", {}, totalRow));
+  const key = h("div", { class: "rc-key" }, h("b", {}, "GRADE INTERPRETATION ::: "), card.gradeKey.map((g) => h("span", { class: `rc-g rc-g-${tone(g.g)}` }, `${g.g}: ${String(g.label).toUpperCase()}`)));
+
+  const meter = (n) => h("span", { class: "rc-dots", "aria-label": n ? `${n} of 5` : "not rated" }, [1, 2, 3, 4, 5].map((i) => h("i", { class: i <= n ? "on" : "" })));
+  const domain = (title, d) => h("section", { class: "rc-dom" }, h("h3", {}, title),
+    h("ul", {}, d.items.map((i) => h("li", {}, h("span", {}, i.label), meter(i.rating), h("em", {}, i.text || "--")))),
+    h("div", { class: "rc-dtot" }, h("span", {}, "TOTAL SCORE"), h("b", {}, String(d.total || "")), h("span", {}, "SCORE OBTAINED"), h("b", {}, String(d.obtained || ""))));
+  const ratingKey = h("div", { class: "rc-key rc-key-s" }, h("b", {}, "NON-COGNITIVE ASPECTS RATING KEYS: "), [5, 4, 3, 2, 1].map((n) => h("span", {}, `${n}-${RATING_NAME[n]}`)));
+
   const cm = card.comments;
-  const comments = h("table", { class: "rc-t rc-cm" },
-    h("tr", {}, td("Class Tutor's Comment:", { cls: "rc-lab" }), td(cm.tutor, { cls: "rc-b rc-sm" }), td("Class Tutor's Name:", { cls: "rc-lab" }), td(cm.tutorName, { cls: "rc-val" })),
-    h("tr", {}, td("Principal's Comment:", { cls: "rc-lab" }), td(cm.principal, { cls: "rc-b rc-c" }), td("Parent Signature:", { cls: "rc-lab" }), td("")),
-    h("tr", {}, td("Principal's Signature/Stamp:", { cls: "rc-lab" }), td(img(cm.signature, "Principal's signature", "rc-sign"), { span: 3 })));
-  const foot = h("table", { class: "rc-t rc-foot" }, h("tr", {}, td(card.footer.nextTerm, { cls: "rc-next" }), td(img(stateLogo, "", "rc-mini"), { cls: "rc-c" }), td(card.header.footerCredit, { cls: "rc-credit" })));
-  return h("article", { class: `rc${card.rows.length > 22 ? " dense" : ""}`, "aria-label": `Report card for ${st.name}` }, head, info, bar("COGNITIVE (ACADEMIC PERFORMANCE)"), cog, key, domain("BEHAVIOURAL (AFFECTIVE DOMAIN)", card.affective, 8), domain("PSYCHOMOTOR DOMAIN", card.psychomotor, 7), ratingKey, comments, foot);
+  const comments = h("section", { class: "rc-cm" },
+    h("div", { class: "rc-box" }, h("small", {}, "Class Tutor's Comment"), h("p", {}, cm.tutor), h("div", { class: "rc-sig" }, h("span", {}, `Class Tutor's Name: ${cm.tutorName || ""}`))),
+    h("div", { class: "rc-box" }, h("small", {}, "Principal's Comment"), h("p", {}, cm.principal), h("div", { class: "rc-sig" }, img(cm.signature, "Principal's signature", "rc-sign"), h("span", {}, "Principal's Signature/Stamp"))),
+    h("div", { class: "rc-box rc-parent" }, h("small", {}, "Parent's acknowledgement"), h("div", { class: "rc-sig" }, h("span", {}, "Parent Signature · Date"))));
+  const foot = h("footer", { class: "rc-foot" }, h("b", { class: "rc-next" }, card.footer.nextTerm), h("span", {}, card.header.footerCredit));
+  const rows = card.rows.length;
+  return h("article", { class: `rc${rows > 24 ? " dense2" : rows > 17 ? " dense" : ""}`, "aria-label": `Report card for ${st.name}` },
+    img(schoolLogo, "", "rc-wm"), top, title, who, att, bar("COGNITIVE (ACADEMIC PERFORMANCE)"), cog, key,
+    h("div", { class: "rc-doms" }, domain("BEHAVIOURAL (AFFECTIVE DOMAIN)", card.affective), domain("PSYCHOMOTOR DOMAIN", card.psychomotor)), ratingKey, comments, foot);
 }
 const ordinalOf = (n) => n + (["th", "st", "nd", "rd"][(n % 100 > 10 && n % 100 < 14) ? 0 : Math.min(n % 10, 4) % 4] || "th");
 

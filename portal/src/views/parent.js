@@ -1,3 +1,4 @@
+import { learnerPanel } from "./classroom.js";
 import { h, mount, toast, empty, field, skeleton, formDialog, confirmDialog } from "../lib/dom.js";
 import { state } from "../lib/store.js";
 import { SINGLE_SCHOOL } from "../lib/config.js";
@@ -95,14 +96,15 @@ export async function parentView(host, mode = "parent") {
   const chips = h("div", { class: "chips", role: "tablist", "aria-label": "Children" }, loaded.map((x, i) => h("button", { role: "tab", "aria-selected": String(i === ui.sel), onclick: () => { ui.sel = i; ui.tab = "progress"; parentView(host, mode); } }, x.child ? x.child.name : x.link.admissionNo, schools && x.brand.name ? h("small", {}, x.brand.name) : null)));
   const head = h("div", { class: "toolbar" }, h("h1", { class: "grow" }, TITLE), student ? null : h("button", { class: "btn btn-primary", onclick: () => linkDialog(refresh) }, "Link another child"));
   if (!cur.child) return mount(host, head, chips, h("div", { class: "card" }, h("p", {}, `Access to admission number ${cur.link.admissionNo} is no longer available. Ask the school for a new code.`)));
-  const child = cur.child, link = cur.link; const tabs = [["progress", "Progress"], ["reports", "Report cards"], ["attendance", "Attendance"], ["details", "Details"]].filter((t) => !student || t[0] !== "details");
+  const child = cur.child, link = cur.link; const tabs = [["progress", "Progress"], ["reports", "Report cards"], ["attendance", "Attendance"], ["assignments", "Assignments"], ["notes", "Lesson notes"], ["notices", "Notices"], ["timetable", "Timetable"], ["details", "Details"]].filter((t) => !student || t[0] !== "details");
   const body = h("div", {}); const tabBar = h("div", { class: "subtabs", role: "tablist" }, tabs.map(([id, l]) => h("button", { class: "tabbtn", role: "tab", "aria-selected": String(ui.tab === id), onclick: () => { ui.tab = id; parentView(host, mode); } }, l)));
   mount(host, head, chips, h("div", { class: "child-head card" }, h("span", { class: "avatar big", "aria-hidden": "true" }, (child.name || "?").slice(0, 1)), h("div", {}, h("strong", {}, child.name), h("div", { class: "hint" }, `${child.class}${child.arm ? " " + child.arm : ""} · Admission no. ${child.admissionNo}${cur.brand.name ? " · " + cur.brand.name : ""}`))), tabBar, body, skeleton(2));
   try {
-    const cards = ui.tab === "details" ? null : await loadCards(link);
+    const CLS = ["assignments", "notes", "notices", "timetable"]; const cards = ui.tab === "details" || CLS.includes(ui.tab) ? null : await loadCards(link);
     if (ui.tab === "progress") { const [rec, notes] = await Promise.all([loadStudentAttendance(link.schoolId, cards.session, link.studentId), student ? [] : loadMyAbsenceNotes(link.schoolId, link.studentId)]); mount(body, studentPanel({ name: child.name, cardsByTerm: cards.byTerm, attendance: rec, notes, mode: student ? "student" : "parent" })); }
     else if (ui.tab === "reports") mount(body, cards.reports.length ? cards.reports.map((r) => h("div", { class: "rc-scroll" }, renderReportCard(r.card, cur.brand), h("button", { class: "btn btn-sm btn-primary", onclick: () => printNodes([renderReportCard(r.card, cur.brand)]) }, "Print / save as PDF"))) : empty("No report cards yet", "Report cards appear here after the school publishes the term."));
     else if (ui.tab === "attendance") mount(body, await attendanceTab(link, child, cards, student));
+    else if (CLS.includes(ui.tab)) mount(body, await learnerPanel(ui.tab, { link, child, student }));
     else mount(body, detailsForm(link, child));
   } catch (e) { mount(body, empty("Cannot load", friendlyAuthError(e))); }
   void confirmDialog;
