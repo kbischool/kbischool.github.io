@@ -9,6 +9,13 @@ import { APP_NAME, SINGLE_SCHOOL, SCHOOL_NAME } from "../lib/config.js";
 
 const CONSENT_VERSION = "draft-1";
 const card = (...k) => h("div", { class: "card authcard" }, h("div", { class: "auth-brand" }, h("img", { src: `${import.meta.env.BASE_URL}assets/icons/logo.webp`, width: 40, height: 42, alt: "" }), h("span", {}, APP_NAME)), ...k);
+
+/** Verification email whose link returns to the portal; falls back to Firebase's plain page if the address is not an authorised domain. */
+async function sendVerification(user) {
+  const url = location.origin + location.pathname;
+  try { await sendEmailVerification(user, { url, handleCodeInApp: false }); }
+  catch (e) { if (e?.code === "auth/unauthorized-continue-uri" || e?.code === "auth/invalid-continue-uri") await sendEmailVerification(user); else throw e; }
+}
 const consentBox = () => h("label", { class: "chk consent" }, h("input", { type: "checkbox", id: "consent" }),
   h("span", {}, "I have read the ", h("a", { href: "../privacy.html", target: "_blank", rel: "noopener" }, "privacy notice (draft)"), " and agree that the school may process this information to run the service, in line with the Nigeria Data Protection Act 2023."));
 
@@ -25,7 +32,7 @@ export function authView(kind) {
     busy(go, true, "");
     try {
       if (isLogin) await signInWithEmailAndPassword(auth, email.value.trim(), pw.value);
-      else { const c = await createUserWithEmailAndPassword(auth, email.value.trim(), pw.value); await sendEmailVerification(c.user); }
+      else { const c = await createUserWithEmailAndPassword(auth, email.value.trim(), pw.value); await sendVerification(c.user); }
     } catch (err) { msg(out, friendlyAuthError(err)); busy(go, false, ""); go.textContent = isLogin ? "Log in" : "Create account"; }
   } }, field("Email", email), field("Password", pw, isLogin ? null : "At least 8 characters."), out, go);
   const google = h("button", { class: "btn btn-block", type: "button", onclick: async () => {
@@ -53,12 +60,23 @@ export function forgotView() {
 
 export function verifyView(user, onDone) {
   const out = h("p", { role: "status", hidden: true });
-  return card(h("h1", {}, "Check your email"), h("p", {}, "We sent a verification link to ", h("strong", {}, user.email), ". Open it, then come back and press the button below."),
+  let done = false, timer = null;
+  const check = async (manual) => {
+    if (done) return;
+    try { await user.reload(); } catch (e) { if (manual) msg(out, friendlyAuthError(e)); return; }
+    if (user.emailVerified) { done = true; clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); try { await user.getIdToken(true); } catch (e) { /* the page reloads next */ } onDone(); }
+    else if (manual) msg(out, "Not verified yet. Open the newest email from us and tap its link. If the link says it has expired or was already used, you may be verified already: wait a few seconds and this page continues by itself.", "error");
+  };
+  const onVisible = () => { if (document.visibilityState === "visible") check(false); };
+  timer = setInterval(() => check(false), 4000);
+  document.addEventListener("visibilitychange", onVisible);
+  return card(h("h1", {}, "Check your email"), h("p", {}, "We sent a verification link to ", h("strong", {}, user.email), ". Open the newest email and tap the link. This page continues by itself once you are verified."),
+    h("p", { class: "muted" }, "Sent it more than once? Only the newest link works. If a link says it has expired or was already used, come back here and press the first button."),
     out,
     h("div", { class: "stack" },
-      h("button", { class: "btn btn-primary", type: "button", onclick: async () => { await user.reload(); if (user.emailVerified) { await user.getIdToken(true); onDone(); } else msg(out, "Not verified yet. Open the link in the email first.", "error"); } }, "I have verified my email"),
-      h("button", { class: "btn", type: "button", onclick: async () => { try { await sendEmailVerification(user); msg(out, "Sent again. Check your inbox and spam folder.", "ok"); } catch (e) { msg(out, friendlyAuthError(e)); } } }, "Send the link again"),
-      h("button", { class: "btn", type: "button", onclick: () => signOut(auth) }, "Use a different account")));
+      h("button", { class: "btn btn-primary", type: "button", onclick: () => check(true) }, "I have verified my email"),
+      h("button", { class: "btn", type: "button", onclick: async () => { try { await sendVerification(user); msg(out, "Sent again. Use only the newest email. Check your inbox and spam folder.", "ok"); } catch (e) { msg(out, friendlyAuthError(e)); } } }, "Send the link again"),
+      h("button", { class: "btn", type: "button", onclick: () => { done = true; clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); signOut(auth); } }, "Use a different account")));
 }
 
 export function waitingView(kind, user) {
