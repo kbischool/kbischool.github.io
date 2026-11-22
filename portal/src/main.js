@@ -5,7 +5,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { state, roleOf } from "./lib/store.js";
 import { APP_NAME } from "./lib/config.js";
 import { loadProfile, loadSchool, tryBootstrapOwner, ownerSchools } from "./lib/data.js";
-import { authView, forgotView, verifyView, waitingView, onboardingView } from "./views/auth.js";
+import { authView, forgotView, verifyView, emailActionView, waitingView, onboardingView } from "./views/auth.js";
 import { overviewView, teachersView, setupView } from "./views/admin.js";
 import { studentsView, stopStudents } from "./views/students.js";
 import { attendanceView, stopAttendance } from "./views/attendance.js";
@@ -65,6 +65,8 @@ async function boot() {
   initTheme($("#theme")); $("#signout").addEventListener("click", () => signOut(auth));
   const net = () => { $("#net").textContent = navigator.onLine ? "Online" : "Offline"; $("#net").dataset.offline = navigator.onLine ? "" : "1"; }; addEventListener("online", net); addEventListener("offline", net); net();
   if (!configured) { setBare(true); return mount(view, h("div", { class: "card authcard" }, h("h1", {}, "Not connected yet"), h("p", {}, "This copy of the KBI Portal has no Firebase settings. Follow portal/docs/SETUP.md, add the six repository secrets, then run the deployment again."))); }
+  const q = new window.URLSearchParams(location.search);
+  if (q.get("mode") === "verifyEmail" && q.get("oobCode")) { setBare(true); return mount(view, emailActionView(q.get("oobCode"), () => location.assign(location.pathname))); }
   addEventListener("hashchange", route);
   onAuthStateChanged(auth, async (user) => {
     Object.assign(state, { user, profile: null, school: null, isOwner: false, schoolId: null });
