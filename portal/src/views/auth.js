@@ -1,6 +1,6 @@
 import { h, field, mount, toast } from "../lib/dom.js";
 import { auth } from "../lib/firebase.js";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendEmailVerification, sendPasswordResetEmail, signOut } from "firebase/auth";
+import { applyActionCode, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendEmailVerification, sendPasswordResetEmail, signOut } from "firebase/auth";
 import { input, select, msg, busy, friendlyAuthError, loadNg, rolePicker } from "./common.js";
 import { registerTeacher, registerParent, registerStudent, publicSchools, DEFAULT_STRUCTURE } from "../lib/data.js";
 import { validPhone } from "../lib/dates.js";
@@ -58,17 +58,30 @@ export function forgotView() {
     h("p", { class: "links" }, h("a", { href: "#/login" }, "Back to log in")));
 }
 
+/** Landing page for the verification link. The code is only used when the person taps the button, so a mail scanner or link preview that merely opens the page cannot use it up. */
+export function emailActionView(oobCode, onDone) {
+  const out = h("p", { role: "status", hidden: true });
+  const go = h("button", { class: "btn btn-primary btn-block", type: "button", onclick: async () => {
+    busy(go, true, "Confirm my email");
+    try { await applyActionCode(auth, oobCode); msg(out, "Your email is verified.", "ok"); go.hidden = true; mount(host, card(h("h1", {}, "Email verified"), h("p", {}, "Thank you. You can now open the portal."), h("button", { class: "btn btn-primary btn-block", type: "button", onclick: onDone }, "Continue to the portal"))); }
+    catch (e) { busy(go, false, "Confirm my email"); msg(out, e?.code === "auth/expired-action-code" || e?.code === "auth/invalid-action-code" ? "This link has expired or was already used. Go back to the portal and press \"I have verified my email\"; if that does not work, log in and ask for a new link." : friendlyAuthError(e)); }
+  } }, "Confirm my email");
+  const host = h("div", {});
+  mount(host, card(h("h1", {}, "Confirm your email"), h("p", {}, "Press the button to finish verifying your email address."), out, go, h("p", { class: "links" }, h("a", { href: location.pathname }, "Back to the portal"))));
+  return host;
+}
+
 export function verifyView(user, onDone) {
   const out = h("p", { role: "status", hidden: true });
   let done = false, timer = null;
   const check = async (manual) => {
     if (done) return;
     try { await user.reload(); } catch (e) { if (manual) msg(out, friendlyAuthError(e)); return; }
-    if (user.emailVerified) { done = true; clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); try { await user.getIdToken(true); } catch (e) { /* the page reloads next */ } onDone(); }
+    if (user.emailVerified) { done = true; window.clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); try { await user.getIdToken(true); } catch (e) { /* the page reloads next */ } onDone(); }
     else if (manual) msg(out, "Not verified yet. Open the newest email from us and tap its link. If the link says it has expired or was already used, you may be verified already: wait a few seconds and this page continues by itself.", "error");
   };
   const onVisible = () => { if (document.visibilityState === "visible") check(false); };
-  timer = setInterval(() => check(false), 4000);
+  timer = window.setInterval(() => check(false), 4000);
   document.addEventListener("visibilitychange", onVisible);
   return card(h("h1", {}, "Check your email"), h("p", {}, "We sent a verification link to ", h("strong", {}, user.email), ". Open the newest email and tap the link. This page continues by itself once you are verified."),
     h("p", { class: "muted" }, "Sent it more than once? Only the newest link works. If a link says it has expired or was already used, come back here and press the first button."),
@@ -76,7 +89,7 @@ export function verifyView(user, onDone) {
     h("div", { class: "stack" },
       h("button", { class: "btn btn-primary", type: "button", onclick: () => check(true) }, "I have verified my email"),
       h("button", { class: "btn", type: "button", onclick: async () => { try { await sendVerification(user); msg(out, "Sent again. Use only the newest email. Check your inbox and spam folder.", "ok"); } catch (e) { msg(out, friendlyAuthError(e)); } } }, "Send the link again"),
-      h("button", { class: "btn", type: "button", onclick: () => { done = true; clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); signOut(auth); } }, "Use a different account")));
+      h("button", { class: "btn", type: "button", onclick: () => { done = true; window.clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); signOut(auth); } }, "Use a different account")));
 }
 
 export function waitingView(kind, user) {
